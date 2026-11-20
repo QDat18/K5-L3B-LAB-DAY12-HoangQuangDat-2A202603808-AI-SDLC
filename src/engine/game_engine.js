@@ -111,9 +111,9 @@ export class GameEngine {
     }
     if (scenario.shades) {
       this.shades = scenario.shades.map((s, idx) => {
-        const id = s.id || `S${idx + 1}`;
-        const pos = s.pos || [0, 0, 0];
-        const state = s.state || "chase";
+        const pos = Array.isArray(s) ? s : (s.pos || [0, 0, 0]);
+        const id = Array.isArray(s) ? `S${idx + 1}` : (s.id || `S${idx + 1}`);
+        const state = Array.isArray(s) ? "chase" : (s.state || "chase");
         return new Shade(id, pos, state);
       });
     }

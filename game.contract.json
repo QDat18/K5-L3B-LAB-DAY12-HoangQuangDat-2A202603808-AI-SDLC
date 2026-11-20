@@ -1,7 +1,7 @@
 {
   "contract_version": "1.0",
   "team": "2A202603808-HoangQuangDat",
-  "build_cmd": "node -e \"console.log('Build complete')\"",
+  "build_cmd": "npm install",
   "run_cmd": "node server.js",
   "headless_cmd": "node src/headless.js",
   "tuning": {
