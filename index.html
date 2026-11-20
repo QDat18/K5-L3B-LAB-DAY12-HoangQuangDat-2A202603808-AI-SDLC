@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Đảo Đèn Lồng - Đêm 1: Đảo Bến (3D Masterpiece)</title>
+  <title>Đảo Đèn Lồng - Chuỗi 3 Đêm (Phase 2 Masterpiece)</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
 
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
     body {
-      background: #05060c;
-      color: #f7f3e8;
+      background: #0E1430;
+      color: #F5F1E6;
       font-family: 'Plus Jakarta Sans', sans-serif;
       overflow: hidden;
       width: 100vw;
@@ -18,22 +18,20 @@
     }
     #game-canvas {
       position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      top: 0; left: 0; width: 100%; height: 100%;
       display: block;
     }
 
-    /* Screen Effects */
     #vignette {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
       pointer-events: none;
-      box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.8), inset 0 0 200px rgba(10, 5, 20, 0.6);
-      transition: background 0.2s ease;
+      box-shadow: inset 0 0 120px rgba(14, 20, 48, 0.9), inset 0 0 240px rgba(18, 10, 26, 0.7);
+      transition: background 0.25s ease;
       z-index: 5;
     }
     .hit-flash {
-      background: radial-gradient(circle, rgba(230, 57, 70, 0.2) 0%, rgba(200, 20, 40, 0.6) 100%) !important;
+      background: radial-gradient(circle, rgba(255, 90, 95, 0.25) 0%, rgba(200, 16, 46, 0.6) 100%) !important;
     }
 
     /* HUD Layout */
@@ -44,236 +42,256 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 24px;
+      padding: 20px 28px;
       z-index: 10;
     }
 
-    .glass-panel {
-      background: rgba(12, 16, 28, 0.72);
-      border: 1px solid rgba(255, 215, 120, 0.2);
+    .glass-card {
+      background: rgba(14, 20, 48, 0.78);
+      border: 1px solid rgba(242, 193, 78, 0.3);
       border-radius: 16px;
       backdrop-filter: blur(16px);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      padding: 14px 22px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65);
+      padding: 12px 20px;
     }
 
-    .hud-header {
+    .hud-top {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
       width: 100%;
     }
 
-    .title-banner {
+    /* Left: Flames & Night Title */
+    .night-title {
       font-family: 'Cinzel', serif;
-      font-size: 20px;
-      letter-spacing: 2px;
-      color: #ffd166;
-      text-shadow: 0 0 16px rgba(255, 209, 102, 0.6);
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-size: 18px;
+      color: #F2C14E;
+      letter-spacing: 1.5px;
+      text-shadow: 0 0 12px rgba(242, 193, 78, 0.5);
     }
-
     .flames-row {
       display: flex;
-      gap: 10px;
-      align-items: center;
-      margin-top: 4px;
+      gap: 8px;
+      margin-top: 6px;
     }
-    .flame-orb {
-      width: 32px; height: 32px;
+    .flame-pip {
+      width: 28px; height: 28px;
       border-radius: 50%;
-      background: radial-gradient(circle, #ffeedd 10%, #ff9f1c 50%, #e71d36 90%);
-      box-shadow: 0 0 14px #ff9f1c, 0 0 28px rgba(231, 29, 54, 0.6);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 16px;
-      animation: flamePulse 1.8s infinite ease-in-out;
-      transition: all 0.3s ease;
+      background: radial-gradient(circle, #FFF6C2 10%, #FFB347 50%, #C8102E 90%);
+      box-shadow: 0 0 12px #FFB347;
+      display: flex; justify-content: center; align-items: center;
+      font-size: 15px;
+      transition: all 0.3s;
     }
     .flame-lost {
-      background: #2a2c38 !important;
+      background: #3A3450 !important;
       box-shadow: none !important;
       opacity: 0.35;
       transform: scale(0.85);
     }
-    @keyframes flamePulse {
-      0%, 100% { transform: scale(1); filter: brightness(1); }
-      50% { transform: scale(1.08); filter: brightness(1.25); }
-    }
 
-    .stats-bar {
-      display: flex;
-      gap: 28px;
-    }
-    .stat-col {
+    /* Center: Big Timer & Danger Flash */
+    .timer-panel {
       display: flex;
       flex-direction: column;
       align-items: center;
+      min-width: 130px;
     }
-    .stat-title {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: #a49e8d;
-      margin-bottom: 2px;
-    }
-    .stat-number {
+    .timer-digits {
       font-family: 'Cinzel', serif;
-      font-size: 22px;
+      font-size: 30px;
+      font-weight: 900;
+      color: #F5F1E6;
+      letter-spacing: 2px;
+      text-shadow: 0 0 16px rgba(255, 233, 176, 0.5);
+    }
+    .timer-danger {
+      color: #FF5A5F !important;
+      text-shadow: 0 0 20px #FF5A5F !important;
+      animation: dangerBlink 0.8s infinite alternate;
+    }
+    @keyframes dangerBlink {
+      from { opacity: 0.6; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1.05); }
+    }
+
+    /* Right: Lanterns lit, Score & Radar */
+    .top-right {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .stats-col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    .stat-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #8FA3B8;
+    }
+    .stat-val {
+      font-family: 'Cinzel', serif;
+      font-size: 20px;
       font-weight: 700;
-      color: #ffeaa7;
-      text-shadow: 0 0 10px rgba(255, 234, 167, 0.4);
+      color: #F2C14E;
     }
-
-    /* Minimap Radar */
-    .radar-box {
-      width: 110px; height: 110px;
+    .radar-frame {
+      width: 90px; height: 90px;
       border-radius: 50%;
-      background: rgba(10, 14, 25, 0.85);
-      border: 2px solid rgba(255, 215, 120, 0.35);
-      position: relative;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+      border: 2px solid rgba(242, 193, 78, 0.4);
+      background: rgba(14, 20, 48, 0.9);
       overflow: hidden;
-    }
-    #radar-canvas {
-      width: 100%; height: 100%;
+      box-shadow: 0 0 16px rgba(0,0,0,0.8);
     }
 
-    /* HUD Footer */
-    .hud-footer {
+    /* Bottom: 10-Slot Mote Bar (Center) & Skills (Right) */
+    .hud-bottom {
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
-    }
-    .guide-box {
-      font-size: 13px;
-      color: #dfd8c8;
-      line-height: 1.8;
-    }
-    .badge-key {
-      display: inline-block;
-      background: rgba(255, 255, 255, 0.12);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      border-radius: 6px;
-      padding: 1px 8px;
-      font-size: 11px;
-      font-weight: 700;
-      color: #ffeaa7;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+      width: 100%;
     }
 
-    .skill-widget {
+    /* 10-Slot Mote Bar */
+    .mote-bar-container {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 16px;
+      gap: 6px;
+      margin: 0 auto;
     }
-    .skill-circle {
-      position: relative;
-      width: 64px; height: 64px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #ffe66d 0%, #ff9f1c 70%, #d8572a 100%);
-      border: 3px solid #fff;
+    .mote-slots {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 26px;
-      box-shadow: 0 0 24px rgba(255, 159, 28, 0.7);
-      cursor: pointer;
+      gap: 6px;
+    }
+    .slot-cell {
+      width: 22px; height: 32px;
+      border-radius: 6px;
+      border: 1.5px solid rgba(242, 193, 78, 0.35);
+      background: rgba(18, 10, 26, 0.6);
+      transition: all 0.25s ease;
+    }
+    .slot-filled {
+      background: linear-gradient(180deg, #FFF6C2 0%, #FFB347 100%);
+      box-shadow: 0 0 10px #FFB347;
+      border-color: #FFF6C2;
+    }
+
+    /* Skills: Dash & Pulse */
+    .skills-row {
+      display: flex;
+      gap: 14px;
       pointer-events: auto;
+    }
+    .skill-btn {
+      position: relative;
+      width: 58px; height: 58px;
+      border-radius: 50%;
+      border: 2px solid rgba(242, 193, 78, 0.6);
+      background: radial-gradient(circle, #FFB347 0%, #C8102E 100%);
+      display: flex; justify-content: center; align-items: center;
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow: 0 0 16px rgba(255, 179, 71, 0.4);
       transition: transform 0.15s;
     }
-    .skill-circle:active {
-      transform: scale(0.92);
+    .skill-btn:active { transform: scale(0.92); }
+    .skill-key-badge {
+      position: absolute;
+      bottom: -6px; right: -4px;
+      background: #0E1430;
+      border: 1px solid #F2C14E;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 4px;
+      color: #F5F1E6;
     }
-    .cooldown-overlay {
+    .cd-cover {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
       border-radius: 50%;
-      background: rgba(10, 12, 20, 0.75);
+      background: rgba(14, 20, 48, 0.85);
       display: none;
-      justify-content: center;
-      align-items: center;
+      justify-content: center; align-items: center;
+      font-size: 13px; font-weight: 700; color: #FFF;
+    }
+
+    /* Prompt Helper (Nearby Lantern) */
+    #interact-prompt {
+      position: absolute;
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(14, 20, 48, 0.88);
+      border: 2px solid #FFB347;
+      border-radius: 20px;
+      padding: 8px 24px;
       font-size: 14px;
       font-weight: 700;
-      color: #fff;
+      color: #FFE9B0;
+      display: none;
+      box-shadow: 0 0 24px rgba(255, 179, 71, 0.6);
+      pointer-events: none;
+      z-index: 15;
     }
 
-    /* Floating Popups */
-    .toast-msg {
+    /* Toast Notification */
+    #toast-banner {
       position: absolute;
-      top: 35%;
-      left: 50%;
+      top: 30%; left: 50%;
       transform: translate(-50%, -50%);
       font-family: 'Cinzel', serif;
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 900;
-      color: #ffeaa7;
-      text-shadow: 0 0 20px rgba(255, 234, 167, 0.8), 0 4px 8px rgba(0,0,0,0.8);
-      pointer-events: none;
+      color: #FFE9B0;
+      text-shadow: 0 0 20px rgba(255, 179, 71, 0.9), 0 3px 6px #000;
       opacity: 0;
-      transition: all 0.4s ease-out;
-      z-index: 20;
+      transition: all 0.35s ease;
+      pointer-events: none;
+      z-index: 25;
     }
 
-    /* Modal End Game */
-    #end-modal {
+    /* Modals: Menu, Pause, Victory/Defeat */
+    .overlay-modal {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(4, 6, 14, 0.88);
-      backdrop-filter: blur(20px);
+      background: rgba(14, 20, 48, 0.92);
+      backdrop-filter: blur(16px);
       display: none;
-      justify-content: center;
-      align-items: center;
+      justify-content: center; align-items: center;
       pointer-events: auto;
       z-index: 100;
     }
-    .end-card {
-      background: linear-gradient(145deg, #161b2e 0%, #0d101c 100%);
-      border: 2px solid #ffd166;
-      border-radius: 24px;
-      padding: 48px;
+    .modal-dialog {
+      background: #1B2350;
+      border: 2px solid #F2C14E;
+      border-radius: 20px;
+      padding: 36px 44px;
       text-align: center;
       max-width: 520px;
-      box-shadow: 0 0 80px rgba(255, 209, 102, 0.25), 0 20px 50px rgba(0,0,0,0.8);
-      animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 0 60px rgba(242, 193, 78, 0.3);
     }
-    @keyframes modalPop {
-      0% { transform: scale(0.85); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    .modal-headline {
-      font-family: 'Cinzel', serif;
-      font-size: 36px;
-      color: #ffd166;
-      margin-bottom: 12px;
-      text-shadow: 0 0 20px rgba(255, 209, 102, 0.5);
-    }
-    .modal-body {
-      font-size: 16px;
-      color: #cfc8b8;
-      line-height: 1.6;
-      margin-bottom: 30px;
-    }
-    .btn-action {
-      background: linear-gradient(135deg, #ffe66d 0%, #ff9f1c 100%);
+    .modal-btn {
+      background: linear-gradient(135deg, #FFB347 0%, #C8102E 100%);
       border: none;
-      border-radius: 12px;
-      color: #111420;
+      border-radius: 10px;
+      color: #FFF;
       font-family: 'Cinzel', serif;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
-      padding: 14px 40px;
+      padding: 12px 30px;
+      margin: 8px;
       cursor: pointer;
-      box-shadow: 0 6px 24px rgba(255, 159, 28, 0.5);
       transition: all 0.2s;
     }
-    .btn-action:hover {
-      transform: translateY(-2px) scale(1.04);
-      box-shadow: 0 10px 32px rgba(255, 159, 28, 0.7);
+    .modal-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #FFB347;
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -282,228 +300,178 @@
   <div id="vignette"></div>
   <canvas id="game-canvas"></canvas>
 
-  <div id="toast" class="toast-msg"></div>
+  <div id="interact-prompt">E — Nạp ánh sáng (<span id="prompt-fill">0</span>/10)</div>
+  <div id="toast-banner"></div>
 
+  <!-- HUD Overlay -->
   <div id="hud">
-    <div class="hud-header">
-      <div class="glass-panel">
-        <div class="title-banner">🏮 ĐẢO ĐÈN LỒNG · ĐÊM 1</div>
-        <div class="stat-title">Ngọn Lửa Sinh Lực (Flames)</div>
-        <div class="flames-row" id="flames-row">
-          <div class="flame-orb" id="flame-1">🔥</div>
-          <div class="flame-orb" id="flame-2">🔥</div>
-          <div class="flame-orb" id="flame-3">🔥</div>
+    <div class="hud-top">
+      <div class="glass-card">
+        <div class="night-title" id="night-banner">ĐÊM 1 — ĐẢO BẾN</div>
+        <div class="flames-row">
+          <div class="flame-pip" id="flame-1">🔥</div>
+          <div class="flame-pip" id="flame-2">🔥</div>
+          <div class="flame-pip" id="flame-3">🔥</div>
         </div>
       </div>
 
-      <div class="glass-panel stats-bar">
-        <div class="stat-col">
-          <div class="stat-title">Đom Đóm</div>
-          <div class="stat-number"><span id="carried-txt">0</span> / 5 💡</div>
-        </div>
-        <div class="stat-col">
-          <div class="stat-title">Đèn Đã Thắp</div>
-          <div class="stat-number"><span id="lit-txt">0</span> / 5 🏮</div>
-        </div>
-        <div class="stat-col">
-          <div class="stat-title">Điểm Số</div>
-          <div class="stat-number" id="score-txt">0</div>
-        </div>
-        <div class="stat-col">
-          <div class="stat-title">Thời Gian</div>
-          <div class="stat-number" id="time-txt">180s</div>
-        </div>
+      <div class="glass-card timer-panel">
+        <div class="stat-label">Thời Gian Đêm</div>
+        <div class="timer-digits" id="timer-display">05:00</div>
       </div>
 
-      <div class="radar-box">
-        <canvas id="radar-canvas" width="110" height="110"></canvas>
+      <div class="top-right">
+        <div class="glass-card stats-col">
+          <div><span class="stat-label">Đèn Thắp: </span><span class="stat-val" id="lit-stat">0/5</span></div>
+          <div><span class="stat-label">Điểm Số: </span><span class="stat-val" id="score-stat">0</span></div>
+        </div>
+        <div class="radar-frame">
+          <canvas id="radar-cvs" width="90" height="90"></canvas>
+        </div>
       </div>
     </div>
 
-    <div class="hud-footer">
-      <div class="glass-panel guide-box">
-        <div><span class="badge-key">W A S D</span> / <span class="badge-key">Mũi tên</span> : Di chuyển Mây (người giữ đèn)</div>
-        <div><span class="badge-key">E</span> : Nạp đom đóm thắp sáng Đèn Lớn (đứng trong 2.5m)</div>
-        <div><span class="badge-key">Q</span> / <span class="badge-key">Phím Cách</span> : Kỹ năng <strong>Tỏa Sáng (Pulse)</strong></div>
+    <div class="hud-bottom">
+      <div class="glass-card" style="font-size:12px; line-height:1.6; color:#C9B48A;">
+        <div><strong style="color:#FFF;">W A S D</strong> : Di chuyển · <strong style="color:#FFF;">Space</strong> : Nhảy</div>
+        <div><strong style="color:#FFF;">Shift / F</strong> : Lướt (14 m/s) · <strong style="color:#FFF;">Q</strong> : Tỏa Sáng</div>
+        <div><strong style="color:#FFF;">P / Esc</strong> : Tạm dừng</div>
       </div>
 
-      <div class="glass-panel skill-widget">
-        <div style="text-align: right;">
-          <div class="stat-title">Kỹ Năng Ánh Sáng</div>
-          <div style="font-weight: 700; color: #ffeaa7; font-size: 15px;">Tỏa Sáng [Q]</div>
-          <div style="font-size: 11px; color: #aaa;">Tốn 1 đom đóm · Đẩy lùi & choáng quái</div>
+      <!-- 10-Slot Mote Capacity Bar -->
+      <div class="glass-card mote-bar-container">
+        <div class="stat-label">Đom đóm tích lũy (<span id="mote-count">0</span> / 10)</div>
+        <div class="mote-slots" id="mote-slots-row">
+          <!-- 10 slots populated dynamically -->
         </div>
-        <div class="skill-circle" id="skill-btn" onclick="triggerPulse()">
+      </div>
+
+      <div class="skills-row">
+        <!-- Dash [Shift] -->
+        <div class="skill-btn" id="dash-btn" onclick="triggerDash()">
+          💨
+          <span class="skill-key-badge">Shift</span>
+          <div class="cd-cover" id="dash-cd">1.5s</div>
+        </div>
+
+        <!-- Pulse [Q] -->
+        <div class="skill-btn" id="pulse-btn" onclick="triggerPulse()">
           ✨
-          <div class="cooldown-overlay" id="cd-overlay">1s</div>
+          <span class="skill-key-badge">Q</span>
+          <div class="cd-cover" id="pulse-cd">3.0s</div>
         </div>
       </div>
     </div>
   </div>
 
-  <div id="end-modal">
-    <div class="end-card">
-      <h1 class="modal-headline" id="modal-heading">CHIẾN THẮNG</h1>
-      <p class="modal-body" id="modal-text">Toàn bộ 5 Đèn Lớn đã rực sáng, sương đen tan biến!</p>
-      <button class="btn-action" onclick="restart()">Chơi Lại Ván Mới</button>
+  <!-- Pause Menu -->
+  <div id="pause-modal" class="overlay-modal">
+    <div class="modal-dialog">
+      <h2 style="font-family:'Cinzel', serif; color:#F2C14E; margin-bottom:16px;">TẠM DỪNG</h2>
+      <p style="color:#8FA3B8; margin-bottom:24px;">Hành trình giữ đèn đang được giữ yên.</p>
+      <div><button class="modal-btn" onclick="togglePause()">Tiếp Tục</button></div>
+      <div><button class="modal-btn" onclick="restartCurrentNight()">Chơi Lại Đêm Này</button></div>
+      <div><button class="modal-btn" onclick="switchNight(1)">Về Đêm 1</button></div>
+    </div>
+  </div>
+
+  <!-- End Game Modal -->
+  <div id="end-modal" class="overlay-modal">
+    <div class="modal-dialog">
+      <h1 id="end-title" style="font-family:'Cinzel', serif; color:#F2C14E; font-size:32px; margin-bottom:12px;">CHIẾN THẮNG</h1>
+      <p id="end-desc" style="color:#C9B48A; line-height:1.6; margin-bottom:24px;">Tất cả ngọn đèn đã thắp sáng rực rỡ!</p>
+      <button class="modal-btn" id="next-night-btn" onclick="nextNight()">Đêm Tiếp Theo</button>
+      <button class="modal-btn" onclick="restartCurrentNight()">Chơi Lại</button>
     </div>
   </div>
 
   <script type="module">
     import { GameEngine } from './src/engine/game_engine.js';
-    import { ISLAND_RADIUS } from './src/engine/constants.js';
+    import { getMapForNight } from './src/engine/maps.js';
 
-    // ==========================================
-    // PROCEDURAL AUDIO ENGINE (WEB AUDIO API - 100% CC0)
-    // ==========================================
+    // Build 10 slots in HUD
+    const slotsRow = document.getElementById('mote-slots-row');
+    for (let i = 0; i < 10; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'slot-cell';
+      cell.id = `slot-${i}`;
+      slotsRow.appendChild(cell);
+    }
+
+    // Audio Engine
     let audioCtx = null;
-    let ambientGain = null;
-
     function ensureAudio() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        startAmbientSound();
-      }
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (audioCtx.state === 'suspended') audioCtx.resume();
     }
-
-    function startAmbientSound() {
-      // Wind background noise
-      const bufferSize = audioCtx.sampleRate * 2;
-      const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const output = noiseBuffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        output[i] = Math.random() * 2 - 1;
-      }
-      const whiteNoise = audioCtx.createBufferSource();
-      whiteNoise.buffer = noiseBuffer;
-      whiteNoise.loop = true;
-
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(320, audioCtx.currentTime);
-
-      ambientGain = audioCtx.createGain();
-      ambientGain.gain.setValueAtTime(0.06, audioCtx.currentTime);
-
-      whiteNoise.connect(filter);
-      filter.connect(ambientGain);
-      ambientGain.connect(audioCtx.destination);
-      whiteNoise.start();
-    }
-
-    function playTone(freq, type = 'sine', duration = 0.25, vol = 0.2) {
+    function playTone(f, type = 'sine', d = 0.2, v = 0.2) {
       if (!audioCtx) return;
       try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + duration);
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = type;
+        o.frequency.setValueAtTime(f, audioCtx.currentTime);
+        g.gain.setValueAtTime(v, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + d);
+        o.connect(g);
+        g.connect(audioCtx.destination);
+        o.start();
+        o.stop(audioCtx.currentTime + d);
       } catch (e) {}
     }
 
-    const sfx = {
-      mote: () => {
-        playTone(659.25, 'triangle', 0.2, 0.2); // E5
-        setTimeout(() => playTone(880.0, 'sine', 0.25, 0.18), 50); // A5
-      },
-      deposit: () => {
-        playTone(440.0, 'sine', 0.35, 0.25);
-        playTone(554.37, 'triangle', 0.3, 0.15);
-      },
-      lanternLit: () => {
-        [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, idx) => {
-          setTimeout(() => playTone(f, 'sine', 0.8, 0.3), idx * 100);
-        });
-      },
-      pulse: () => {
-        playTone(150, 'sawtooth', 0.5, 0.3);
-        playTone(400, 'sine', 0.6, 0.35);
-      },
-      hit: () => {
-        playTone(85, 'square', 0.35, 0.4);
-        playTone(60, 'sawtooth', 0.4, 0.3);
-      },
-      footstep: () => {
-        playTone(90 + Math.random() * 20, 'triangle', 0.08, 0.04);
-      }
-    };
-
-    // ==========================================
-    // UI TOAST & SCREEN EFFECTS
-    // ==========================================
-    let toastTimeout = null;
-    function showToast(text, color = '#ffeaa7') {
-      const toast = document.getElementById('toast');
-      toast.innerText = text;
-      toast.style.color = color;
-      toast.style.opacity = '1';
-      toast.style.transform = 'translate(-50%, -60%) scale(1.1)';
-      clearTimeout(toastTimeout);
-      toastTimeout = setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translate(-50%, -50%) scale(1)';
-      }, 1200);
-    }
-
-    function triggerVignetteFlash() {
-      const vig = document.getElementById('vignette');
-      vig.classList.add('hit-flash');
-      setTimeout(() => vig.classList.remove('hit-flash'), 300);
-    }
-
-    let cameraShake = 0;
-
-    // ==========================================
-    // ENGINE INITIALIZATION & INPUTS
-    // ==========================================
-    let engine = new GameEngine({ seed: Math.floor(Math.random() * 100000) });
+    // State & Engine
+    let currentNight = 1;
+    let engine = new GameEngine({ seed: Math.floor(Math.random() * 100000), night: currentNight });
 
     const keyState = {
       w: false, a: false, s: false, d: false,
       ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false,
-      e: false, q: false, ' ': false
+      e: false, q: false, ' ': false, Shift: false, f: false, p: false, Escape: false
     };
 
     window.addEventListener('keydown', (e) => {
       ensureAudio();
       if (keyState.hasOwnProperty(e.key)) keyState[e.key] = true;
+      if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') togglePause();
     });
     window.addEventListener('keyup', (e) => {
       if (keyState.hasOwnProperty(e.key)) keyState[e.key] = false;
     });
 
-    window.triggerPulse = () => {
+    window.triggerDash = () => { keyState.Shift = true; setTimeout(() => keyState.Shift = false, 50); };
+    window.triggerPulse = () => { keyState.q = true; setTimeout(() => keyState.q = false, 50); };
+    window.togglePause = () => {
       ensureAudio();
-      keyState.q = true;
-      setTimeout(() => keyState.q = false, 50);
+      const pModal = document.getElementById('pause-modal');
+      const evs = engine.step({ pause: true });
+      setTimeout(() => engine.step({ pause: false }), 20);
+      pModal.style.display = engine.isPaused ? 'flex' : 'none';
     };
-
-    window.restart = () => {
-      engine = new GameEngine({ seed: Math.floor(Math.random() * 100000) });
+    window.restartCurrentNight = () => {
+      engine = new GameEngine({ seed: Math.floor(Math.random() * 100000), night: currentNight });
+      document.getElementById('pause-modal').style.display = 'none';
       document.getElementById('end-modal').style.display = 'none';
-      cameraShake = 0;
+      rebuild3DWorld();
+    };
+    window.switchNight = (n) => {
+      currentNight = n;
+      window.restartCurrentNight();
+    };
+    window.nextNight = () => {
+      if (currentNight < 3) window.switchNight(currentNight + 1);
+      else window.switchNight(1);
     };
 
-    // ==========================================
-    // THREE.JS 3D WORLD CREATION
-    // ==========================================
+    // Three.js 3D Setup
     const canvas = document.getElementById('game-canvas');
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x060813);
-    scene.fog = new THREE.FogExp2(0x080a18, 0.014);
+    scene.background = new THREE.Color(0x0E1430);
+    scene.fog = new THREE.FogExp2(0x1B2350, 0.012);
 
     const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 800);
     window.addEventListener('resize', () => {
@@ -512,526 +480,302 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // 1. Lighting Setup
-    const ambientLight = new THREE.AmbientLight(0x283050, 0.9);
+    const ambientLight = new THREE.AmbientLight(0x2F5D50, 0.5);
     scene.add(ambientLight);
-
-    const moonLight = new THREE.DirectionalLight(0xa5b8db, 0.7);
-    moonLight.position.set(60, 100, 60);
-    moonLight.castShadow = true;
-    moonLight.shadow.mapSize.width = 2048;
-    moonLight.shadow.mapSize.height = 2048;
+    const moonLight = new THREE.DirectionalLight(0xC9B48A, 0.8);
+    moonLight.position.set(60, 120, 60);
     scene.add(moonLight);
 
-    // 2. Starfield & Moon
-    const starGeo = new THREE.BufferGeometry();
-    const starCount = 1200;
-    const starPositions = new Float32Array(starCount * 3);
-    for (let i = 0; i < starCount * 3; i += 3) {
-      starPositions[i] = (Math.random() - 0.5) * 600;
-      starPositions[i + 1] = 40 + Math.random() * 250;
-      starPositions[i + 2] = (Math.random() - 0.5) * 600;
-    }
-    starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-    const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 1.2, transparent: true, opacity: 0.85 });
-    scene.add(new THREE.Points(starGeo, starMat));
+    // Dynamic 3D Objects Container
+    const worldGroup = new THREE.Group();
+    scene.add(worldGroup);
 
-    // 3. Floating Island (Multi-tier stylized Island)
-    const islandGroup = new THREE.Group();
-    // Top Grass Plateau
-    const topGeo = new THREE.CylinderGeometry(40, 39, 4, 64);
-    const topMat = new THREE.MeshStandardMaterial({ color: 0x1f2e24, roughness: 0.85, metalness: 0.1 });
-    const topMesh = new THREE.Mesh(topGeo, topMat);
-    topMesh.position.y = -2;
-    topMesh.receiveShadow = true;
-    islandGroup.add(topMesh);
-
-    // Rocky Bottom Cliff
-    const rockGeo = new THREE.CylinderGeometry(39, 12, 28, 32);
-    const rockMat = new THREE.MeshStandardMaterial({ color: 0x14161f, roughness: 0.95 });
-    const rockMesh = new THREE.Mesh(rockGeo, rockMat);
-    rockMesh.position.y = -18;
-    islandGroup.add(rockMesh);
-
-    // Decorative Circular Path
-    const pathRingGeo = new THREE.RingGeometry(22, 26, 64);
-    const pathRingMat = new THREE.MeshStandardMaterial({ color: 0x2d3a33, roughness: 0.9, side: THREE.DoubleSide });
-    const pathRing = new THREE.Mesh(pathRingGeo, pathRingMat);
-    pathRing.rotation.x = -Math.PI / 2;
-    pathRing.position.y = 0.02;
-    islandGroup.add(pathRing);
-
-    scene.add(islandGroup);
-
-    // 4. Moving Cloud Ocean Below
-    const clouds = [];
-    const cloudGeo = new THREE.PlaneGeometry(500, 500, 16, 16);
-    for (let i = 0; i < 3; i++) {
-      const cloudMat = new THREE.MeshBasicMaterial({
-        color: 0x090c18,
-        transparent: true,
-        opacity: 0.55 - i * 0.12,
-        depthWrite: false
-      });
-      const cp = new THREE.Mesh(cloudGeo, cloudMat);
-      cp.rotation.x = -Math.PI / 2;
-      cp.position.y = -30 - i * 12;
-      scene.add(cp);
-      clouds.push(cp);
-    }
-
-    // 5. Stylized 3D Model: Mây (With Nón Lá and Hanging Small Lantern)
+    // Player Mesh
     const playerGroup = new THREE.Group();
-    playerGroup.castShadow = true;
-
-    // Body (Robes)
-    const robeGeo = new THREE.CylinderGeometry(0.35, 0.55, 1.3, 16);
-    const robeMat = new THREE.MeshStandardMaterial({ color: 0xeeece4, roughness: 0.7 });
-    const robe = new THREE.Mesh(robeGeo, robeMat);
+    const robe = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.55, 1.3, 16), new THREE.MeshStandardMaterial({ color: 0xE8E2D0 }));
     robe.position.y = 0.65;
     playerGroup.add(robe);
 
-    // Head
-    const headGeo = new THREE.SphereGeometry(0.3, 16, 16);
-    const headMat = new THREE.MeshStandardMaterial({ color: 0xfad2b0 });
-    const head = new THREE.Mesh(headGeo, headMat);
-    head.position.y = 1.5;
-    playerGroup.add(head);
+    const hat = new THREE.Mesh(new THREE.ConeGeometry(0.85, 0.42, 24), new THREE.MeshStandardMaterial({ color: 0xC9B48A }));
+    hat.position.y = 1.65;
+    playerGroup.add(hat);
 
-    // Nón Lá (Conical Hat)
-    const hatGroup = new THREE.Group();
-    hatGroup.position.set(0, 1.75, 0);
-    const coneGeo = new THREE.ConeGeometry(0.85, 0.42, 32);
-    const coneMat = new THREE.MeshStandardMaterial({ color: 0xd6a366, roughness: 0.85 });
-    const cone = new THREE.Mesh(coneGeo, coneMat);
-    hatGroup.add(cone);
+    const scarf = new THREE.Mesh(new THREE.TorusGeometry(0.38, 0.08, 8, 16), new THREE.MeshStandardMaterial({ color: 0xC8102E }));
+    scarf.rotation.x = Math.PI / 2;
+    scarf.position.y = 1.35;
+    playerGroup.add(scarf);
 
-    // Hat Trim Rim
-    const rimGeo = new THREE.TorusGeometry(0.85, 0.03, 8, 32);
-    const rimMat = new THREE.MeshStandardMaterial({ color: 0x8b5a2b });
-    const rim = new THREE.Mesh(rimGeo, rimMat);
-    rim.rotation.x = Math.PI / 2;
-    hatGroup.add(rim);
-
-    // Small Lantern hanging from Mây's Hat
-    const hatLanternPivot = new THREE.Group();
-    hatLanternPivot.position.set(0.42, 0.05, 0.25);
-    const cordGeo = new THREE.CylinderGeometry(0.015, 0.015, 0.25);
-    const cordMat = new THREE.MeshBasicMaterial({ color: 0xd4af37 });
-    const cord = new THREE.Mesh(cordGeo, cordMat);
-    cord.position.y = -0.12;
-    hatLanternPivot.add(cord);
-
-    const smallLanternMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.12, 12, 12),
-      new THREE.MeshStandardMaterial({ color: 0xffaa00, emissive: 0xffaa00, emissiveIntensity: 2.0 })
-    );
-    smallLanternMesh.position.y = -0.28;
-    hatLanternPivot.add(smallLanternMesh);
-    hatGroup.add(hatLanternPivot);
-
-    playerGroup.add(hatGroup);
-
-    // Soft Warm Light from Mây's Lantern
-    const mayLight = new THREE.PointLight(0xffb703, 1.5, 9);
-    mayLight.position.set(0.3, 1.4, 0.3);
-    playerGroup.add(mayLight);
-
-    // Left and Right Legs for walking animation
-    const legGeo = new THREE.CylinderGeometry(0.1, 0.1, 0.4, 8);
-    const legMat = new THREE.MeshStandardMaterial({ color: 0x3d3128 });
-    const leftLeg = new THREE.Mesh(legGeo, legMat);
-    leftLeg.position.set(-0.2, 0.2, 0);
-    const rightLeg = new THREE.Mesh(legGeo, legMat);
-    rightLeg.position.set(0.2, 0.2, 0);
-    playerGroup.add(leftLeg);
-    playerGroup.add(rightLeg);
-
+    const playerPntLight = new THREE.PointLight(0xFFB347, 1.2, 9);
+    playerPntLight.position.set(0, 1.5, 0);
+    playerGroup.add(playerPntLight);
     scene.add(playerGroup);
 
-    // 6. Detailed 5 Pagoda Lanterns (L1 - L5)
-    const lanternData = [];
-    engine.lanterns.forEach(l => {
-      const g = new THREE.Group();
-      g.position.set(l.pos[0], 0, l.pos[2]);
+    let lanternMeshes = [];
+    let moteMeshes = new Map();
+    let shadeMeshes = new Map();
+    let drifterMeshes = new Map();
+    let charmMeshes = new Map();
 
-      // Stone Platform
-      const baseGeo = new THREE.CylinderGeometry(1.2, 1.4, 0.4, 8);
-      const stoneMat = new THREE.MeshStandardMaterial({ color: 0x333742, roughness: 0.9 });
-      const base = new THREE.Mesh(baseGeo, stoneMat);
-      base.position.y = 0.2;
-      g.add(base);
+    function rebuild3DWorld() {
+      // Clear world
+      while (worldGroup.children.length > 0) {
+        worldGroup.remove(worldGroup.children[0]);
+      }
+      lanternMeshes = [];
+      moteMeshes.clear();
+      shadeMeshes.clear();
+      drifterMeshes.clear();
+      charmMeshes.clear();
 
-      // Wooden Pillar
-      const colGeo = new THREE.CylinderGeometry(0.22, 0.26, 3.8, 8);
-      const woodMat = new THREE.MeshStandardMaterial({ color: 0x4a2e18, roughness: 0.8 });
-      const col = new THREE.Mesh(colGeo, woodMat);
-      col.position.y = 2.1;
-      g.add(col);
+      document.getElementById('night-banner').innerText = `ĐÊM ${currentNight} — ${currentNight === 1 ? 'ĐẢO BẾN' : (currentNight === 2 ? 'ĐẢO CAU' : 'ĐẢO CHUÔNG')}`;
 
-      // Pagoda Roof Eaves (Mái ngói cổ)
-      const roofGeo = new THREE.ConeGeometry(1.4, 0.6, 6);
-      const roofMat = new THREE.MeshStandardMaterial({ color: 0x8b3a2b, roughness: 0.7 });
-      const roof = new THREE.Mesh(roofGeo, roofMat);
-      roof.position.y = 4.4;
-      g.add(roof);
+      // Island Terrains
+      if (currentNight === 1) {
+        const isl = new THREE.Mesh(new THREE.CylinderGeometry(40, 36, 8, 64), new THREE.MeshStandardMaterial({ color: 0x2F5D50 }));
+        isl.position.y = -4;
+        worldGroup.add(isl);
+      } else if (currentNight === 2) {
+        // Two islands
+        const islA = new THREE.Mesh(new THREE.CylinderGeometry(28, 24, 8, 48), new THREE.MeshStandardMaterial({ color: 0x2F5D50 }));
+        islA.position.set(0, -4, 0);
+        const islB = new THREE.Mesh(new THREE.CylinderGeometry(28, 24, 8, 48), new THREE.MeshStandardMaterial({ color: 0x2F5D50 }));
+        islB.position.set(70, -4, 0);
+        // Bridge
+        const br = new THREE.Mesh(new THREE.BoxGeometry(18, 0.4, 4), new THREE.MeshStandardMaterial({ color: 0x6B4A2F }));
+        br.position.set(35, -0.2, 0);
+        worldGroup.add(islA, islB, br);
+      } else if (currentNight === 3) {
+        // 3 Tiers
+        const t0 = new THREE.Mesh(new THREE.CylinderGeometry(45, 42, 4, 64), new THREE.MeshStandardMaterial({ color: 0x2F5D50 }));
+        t0.position.y = -2;
+        const t1 = new THREE.Mesh(new THREE.CylinderGeometry(24, 24, 3, 32, 1, false, 0, Math.PI), new THREE.MeshStandardMaterial({ color: 0x3a6a5d }));
+        t1.position.set(0, 1.5, 0);
+        const t2 = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 3, 32), new THREE.MeshStandardMaterial({ color: 0xC9B48A }));
+        t2.position.set(0, 4.5, 0);
+        // Bell tower
+        const bTower = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 8, 16), new THREE.MeshStandardMaterial({ color: 0x6B4A2F }));
+        bTower.position.set(0, 10, 0);
+        worldGroup.add(t0, t1, t2, bTower);
+      }
 
-      // Glowing Rice-paper Lantern Chamber
-      const boxGeo = new THREE.BoxGeometry(0.9, 1.1, 0.9);
-      const boxMat = new THREE.MeshStandardMaterial({
-        color: 0x221a10,
-        emissive: 0x000000,
-        roughness: 0.4
+      // Rebuild Lanterns
+      engine.lanterns.forEach(l => {
+        const g = new THREE.Group();
+        g.position.set(l.pos[0], l.pos[1], l.pos[2]);
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.25, 3.6, 8), new THREE.MeshStandardMaterial({ color: 0x6B4A2F }));
+        post.position.y = 1.8;
+        const bMat = new THREE.MeshStandardMaterial({ color: 0x5B5F6E, emissive: 0x000000 });
+        const box = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.1, 0.9), bMat);
+        box.position.y = 3.2;
+        const light = new THREE.PointLight(0xFFB347, 0, 16);
+        light.position.y = 3.2;
+        g.add(post, box, light);
+        worldGroup.add(g);
+        lanternMeshes.push({ id: l.id, boxMat: bMat, light });
       });
-      const box = new THREE.Mesh(boxGeo, boxMat);
-      box.position.y = 3.6;
-      g.add(box);
-
-      // Warm Point Light (illuminates island when lit)
-      const light = new THREE.PointLight(0xffaa22, 0, 18, 1.4);
-      light.position.set(0, 3.6, 0);
-      g.add(light);
-
-      // Safe Zone Circular Glow Ring on the ground (4m radius)
-      const safeRingGeo = new THREE.RingGeometry(3.9, 4.05, 48);
-      const safeRingMat = new THREE.MeshBasicMaterial({
-        color: 0xffaa22,
-        side: THREE.DoubleSide,
-        transparent: true,
-        opacity: 0
-      });
-      const safeRing = new THREE.Mesh(safeRingGeo, safeRingMat);
-      safeRing.rotation.x = -Math.PI / 2;
-      safeRing.position.y = 0.05;
-      g.add(safeRing);
-
-      scene.add(g);
-      lanternData.push({ id: l.id, group: g, boxMat, light, safeRingMat });
-    });
-
-    // 7. Pulse Visual Effect Ring
-    const pulseRingGeo = new THREE.RingGeometry(0.3, 0.8, 48);
-    const pulseRingMat = new THREE.MeshBasicMaterial({
-      color: 0xffd166,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 0
-    });
-    const pulseRingMesh = new THREE.Mesh(pulseRingGeo, pulseRingMat);
-    pulseRingMesh.rotation.x = -Math.PI / 2;
-    pulseRingMesh.position.y = 0.08;
-    scene.add(pulseRingMesh);
-    let pulseVFX = { active: false, radius: 0, opacity: 0 };
-
-    // 8. Dynamic Entities (Motes & Shades)
-    const moteMeshes = new Map();
-    const shadeMeshes = new Map();
-
-    const moteCoreGeo = new THREE.SphereGeometry(0.2, 16, 16);
-    const moteCoreMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xffe066, emissiveIntensity: 2.2 });
-
-    function createShadeMesh() {
-      const group = new THREE.Group();
-      // Main Ink Body
-      const body = new THREE.Mesh(
-        new THREE.SphereGeometry(0.75, 16, 16),
-        new THREE.MeshStandardMaterial({ color: 0x090510, roughness: 0.3, metalness: 0.2 })
-      );
-      body.position.y = 0.8;
-      group.add(body);
-
-      // Eerie Glowing Eyes
-      const eyeGeo = new THREE.SphereGeometry(0.09, 8, 8);
-      const eyeMat = new THREE.MeshBasicMaterial({ color: 0xd00000 });
-      const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
-      leftEye.position.set(-0.25, 0.9, 0.65);
-      const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
-      rightEye.position.set(0.25, 0.9, 0.65);
-      group.add(leftEye);
-      group.add(rightEye);
-
-      return group;
     }
 
-    // ==========================================
-    // MINIMAP RADAR RENDERER
-    // ==========================================
-    const radarCanvas = document.getElementById('radar-canvas');
-    const radarCtx = radarCanvas.getContext('2d');
+    rebuild3DWorld();
 
-    function renderRadar() {
-      radarCtx.clearRect(0, 0, 110, 110);
-      const cx = 55, cy = 55, scale = 50 / ISLAND_RADIUS;
+    // Radar Minimap
+    const radarCvs = document.getElementById('radar-cvs');
+    const rCtx = radarCvs.getContext('2d');
+    function drawRadar() {
+      rCtx.clearRect(0, 0, 90, 90);
+      rCtx.fillStyle = 'rgba(14, 20, 48, 0.7)';
+      rCtx.fillRect(0, 0, 90, 90);
+      const cx = 45, cy = 45, scale = 40 / (currentNight === 2 ? 80 : 45);
 
-      // Island border
-      radarCtx.beginPath();
-      radarCtx.arc(cx, cy, 48, 0, Math.PI * 2);
-      radarCtx.fillStyle = 'rgba(20, 30, 45, 0.6)';
-      radarCtx.fill();
-      radarCtx.strokeStyle = 'rgba(255, 215, 120, 0.4)';
-      radarCtx.lineWidth = 1.5;
-      radarCtx.stroke();
-
-      // Draw Lanterns
       engine.lanterns.forEach(l => {
-        const lx = cx + l.pos[0] * scale;
-        const ly = cy + l.pos[2] * scale;
-        radarCtx.beginPath();
-        radarCtx.arc(lx, ly, 4, 0, Math.PI * 2);
-        radarCtx.fillStyle = l.lit ? '#ffaa00' : '#555a68';
-        radarCtx.fill();
+        rCtx.beginPath();
+        rCtx.arc(cx + l.pos[0] * scale, cy + l.pos[2] * scale, 3, 0, Math.PI * 2);
+        rCtx.fillStyle = l.lit ? '#FFB347' : '#5B5F6E';
+        rCtx.fill();
       });
 
-      // Draw Motes
       engine.motes.forEach(m => {
         if (m.active) {
-          const mx = cx + m.pos[0] * scale;
-          const my = cy + m.pos[2] * scale;
-          radarCtx.beginPath();
-          radarCtx.arc(mx, my, 1.8, 0, Math.PI * 2);
-          radarCtx.fillStyle = '#ffeaa7';
-          radarCtx.fill();
+          rCtx.beginPath();
+          rCtx.arc(cx + m.pos[0] * scale, cy + m.pos[2] * scale, 1.5, 0, Math.PI * 2);
+          rCtx.fillStyle = '#FFF6C2';
+          rCtx.fill();
         }
       });
 
-      // Draw Shades
       engine.shades.forEach(s => {
-        const sx = cx + s.pos[0] * scale;
-        const sy = cy + s.pos[2] * scale;
-        radarCtx.beginPath();
-        radarCtx.arc(sx, sy, 3, 0, Math.PI * 2);
-        radarCtx.fillStyle = s.state === 'stunned' ? '#888' : '#e63946';
-        radarCtx.fill();
+        rCtx.beginPath();
+        rCtx.arc(cx + s.pos[0] * scale, cy + s.pos[2] * scale, 2.5, 0, Math.PI * 2);
+        rCtx.fillStyle = s.state === 'stunned' ? '#3A3450' : '#C8102E';
+        rCtx.fill();
       });
 
-      // Draw Player (Center triangle/dot)
-      const px = cx + engine.player.pos[0] * scale;
-      const py = cy + engine.player.pos[2] * scale;
-      radarCtx.beginPath();
-      radarCtx.arc(px, py, 3.5, 0, Math.PI * 2);
-      radarCtx.fillStyle = '#00f5d4';
-      radarCtx.fill();
-      radarCtx.strokeStyle = '#fff';
-      radarCtx.lineWidth = 1;
-      radarCtx.stroke();
+      // Player
+      rCtx.beginPath();
+      rCtx.arc(cx + engine.player.pos[0] * scale, cy + engine.player.pos[2] * scale, 3.2, 0, Math.PI * 2);
+      rCtx.fillStyle = '#F2C14E';
+      rCtx.fill();
     }
 
-    // ==========================================
-    // MAIN GAME LOOP (TICK & ANIMATION)
-    // ==========================================
+    // Animation Loop
     let lastTime = performance.now();
-    const tickInterval = 1000 / 60;
-    let accumulator = 0;
-    let walkAnimTime = 0;
-    let stepTimer = 0;
-
-    function gameLoop(now) {
-      requestAnimationFrame(gameLoop);
+    function animate(now) {
+      requestAnimationFrame(animate);
       const dt = now - lastTime;
       lastTime = now;
-      accumulator += dt;
 
-      while (accumulator >= tickInterval) {
-        accumulator -= tickInterval;
+      // Check inputs
+      let mx = 0, mz = 0;
+      if (keyState.w || keyState.ArrowUp) mz += 1;
+      if (keyState.s || keyState.ArrowDown) mz -= 1;
+      if (keyState.a || keyState.ArrowLeft) mx -= 1;
+      if (keyState.d || keyState.ArrowRight) mx += 1;
 
-        let mx = 0, mz = 0;
-        if (keyState.w || keyState.ArrowUp) mz += 1;
-        if (keyState.s || keyState.ArrowDown) mz -= 1;
-        if (keyState.a || keyState.ArrowLeft) mx -= 1;
-        if (keyState.d || keyState.ArrowRight) mx += 1;
+      const events = engine.step({
+        move: [mx, mz],
+        cam_yaw_deg: 0,
+        jump: keyState[' '],
+        interact: keyState.e,
+        pulse: keyState.q,
+        dash: keyState.Shift || keyState.f
+      });
 
-        const isMoving = (mx !== 0 || mz !== 0);
-        if (isMoving) {
-          walkAnimTime += 0.22;
-          stepTimer += 1;
-          if (stepTimer % 20 === 0) sfx.footstep();
-        } else {
-          walkAnimTime *= 0.8;
+      // Handle Event SFX & UI
+      for (const ev of events) {
+        if (ev.name === 'mote_picked') playTone(784, 'triangle', 0.15, 0.2);
+        else if (ev.name === 'deposit') playTone(440, 'sine', 0.25, 0.2);
+        else if (ev.name === 'lantern_lit') playTone(880, 'sine', 0.6, 0.3);
+        else if (ev.name === 'dash') playTone(220, 'sawtooth', 0.2, 0.25);
+        else if (ev.name === 'pulse') playTone(330, 'sawtooth', 0.4, 0.3);
+        else if (ev.name === 'player_hit') {
+          playTone(90, 'square', 0.3, 0.4);
+          document.getElementById('vignette').classList.add('hit-flash');
+          setTimeout(() => document.getElementById('vignette').classList.remove('hit-flash'), 300);
         }
-
-        // Camera yaw relative movement
-        const events = engine.step({
-          move: [mx, mz],
-          cam_yaw_deg: 0,
-          interact: keyState.e,
-          pulse: keyState.q || keyState[' ']
-        });
-
-        // Handle Events
-        for (const ev of events) {
-          if (ev.name === 'mote_picked') {
-            sfx.mote();
-            showToast('+1 Đom đóm! (+10)', '#ffeaa7');
-          } else if (ev.name === 'deposit') {
-            sfx.deposit();
-            showToast(`Nạp ${ev.data.amount} đom đóm vào ${ev.data.lantern_id}`, '#ffd166');
-          } else if (ev.name === 'lantern_lit') {
-            sfx.lanternLit();
-            cameraShake = 0.5;
-            showToast(`🏮 ${ev.data.lantern_id} ĐÃ THẮP SÁNG! (+100)`, '#ffaa00');
-          } else if (ev.name === 'pulse') {
-            sfx.pulse();
-            pulseVFX = { active: true, radius: 0.5, opacity: 1.0 };
-            const count = ev.data.stunned_ids.length;
-            if (count > 0) {
-              cameraShake = 0.25;
-              showToast(`✨ Đã làm choáng ${count} Bóng Mực!`, '#00f5d4');
-            } else {
-              showToast('✨ Tỏa Sáng!', '#ffd166');
-            }
-          } else if (ev.name === 'player_hit') {
-            sfx.hit();
-            cameraShake = 0.6;
-            triggerVignetteFlash();
-            showToast(`💥 Bị tấn công! Mất ${ev.data.dropped} đom đóm!`, '#e63946');
-          } else if (ev.name === 'game_over') {
-            const modal = document.getElementById('end-modal');
-            const h = document.getElementById('modal-heading');
-            const t = document.getElementById('modal-text');
-            modal.style.display = 'flex';
-            if (ev.data.result === 'won') {
-              h.innerText = '🏮 CHIẾN THẮNG!';
-              t.innerText = `Mây đã thắp sáng cả 5 Đèn Lớn của Đảo Bến!\nTổng điểm đạt được: ${engine.score}`;
-            } else {
-              h.innerText = '💀 THẤT BẠI!';
-              t.innerText = ev.data.reason === 'no_flames'
-                ? 'Mây đã cạn kiệt ngọn lửa sinh lực trước màn sương đen!'
-                : 'Bình minh đã đến trước khi bạn kịp thắp sáng hòn đảo!';
-            }
+        else if (ev.name === 'game_over') {
+          const eModal = document.getElementById('end-modal');
+          const eTitle = document.getElementById('end-title');
+          const eDesc = document.getElementById('end-desc');
+          eModal.style.display = 'flex';
+          if (ev.data.result === 'won') {
+            eTitle.innerText = `CHIẾN THẮNG ĐÊM ${currentNight}!`;
+            eDesc.innerText = `Tất cả ngọn đèn đã rực sáng! Điểm số: ${engine.score}`;
+          } else {
+            eTitle.innerText = 'THẤT BẠI!';
+            eDesc.innerText = ev.data.reason === 'no_flames' ? 'Ngọn lửa sinh lực đã tàn!' : 'Bình minh đã ló dạng!';
           }
         }
       }
 
-      // --- PROCEDURAL ANIMATIONS & GRAPHICS UPDATE ---
-      // Player Orientation & Walk Sway
-      const [currVx, currVz] = [engine.inputState.move[0], engine.inputState.move[1]];
-      if (currVx !== 0 || currVz !== 0) {
-        const targetRotY = Math.atan2(currVx, currVz);
-        playerGroup.rotation.y = targetRotY;
-      }
-      playerGroup.position.set(engine.player.pos[0], 0, engine.player.pos[2]);
+      // Update 3D Positions
+      playerGroup.position.set(engine.player.pos[0], engine.player.pos[1], engine.player.pos[2]);
 
-      // Leg swings & Hat bobbing
-      leftLeg.rotation.x = Math.sin(walkAnimTime) * 0.6;
-      rightLeg.rotation.x = -Math.sin(walkAnimTime) * 0.6;
-      robe.position.y = 0.65 + Math.abs(Math.sin(walkAnimTime)) * 0.06;
-      hatGroup.position.y = 1.75 + Math.abs(Math.sin(walkAnimTime)) * 0.08;
-      hatLanternPivot.rotation.z = Math.sin(walkAnimTime * 0.8) * 0.25;
-
-      // Pulse VFX update
-      if (pulseVFX.active) {
-        pulseVFX.radius += 0.35;
-        pulseVFX.opacity -= 0.035;
-        pulseRingMesh.position.set(engine.player.pos[0], 0.08, engine.player.pos[2]);
-        pulseRingMesh.scale.set(pulseVFX.radius, pulseVFX.radius, 1);
-        pulseRingMat.opacity = Math.max(0, pulseVFX.opacity);
-        if (pulseVFX.opacity <= 0) pulseVFX.active = false;
-      }
-
-      // Lanterns State Update
-      engine.lanterns.forEach((l, idx) => {
-        const data = lanternData[idx];
-        if (l.lit) {
-          data.boxMat.emissive.setHex(0xffaa22);
-          data.boxMat.emissiveIntensity = 2.5;
-          data.light.intensity = 2.8;
-          data.safeRingMat.opacity = 0.45 + Math.sin(now * 0.003 + idx) * 0.15;
-        } else {
-          data.boxMat.emissive.setHex(0x000000);
-          data.light.intensity = 0;
-          data.safeRingMat.opacity = 0;
+      // Lanterns
+      engine.lanterns.forEach((l, i) => {
+        const item = lanternMeshes[i];
+        if (item) {
+          if (l.lit) {
+            item.boxMat.emissive.setHex(0xFFB347);
+            item.boxMat.emissiveIntensity = 2.2;
+            item.light.intensity = 2.5;
+          } else {
+            item.boxMat.emissive.setHex(0x000000);
+            item.light.intensity = 0;
+          }
         }
       });
 
-      // Motes (Fireflies with gentle bobbing)
+      // Motes
       engine.motes.forEach(m => {
         let mesh = moteMeshes.get(m.id);
         if (!mesh) {
-          mesh = new THREE.Mesh(moteCoreGeo, moteCoreMat);
-          scene.add(mesh);
+          mesh = new THREE.Mesh(new THREE.SphereGeometry(0.18, 12, 12), new THREE.MeshStandardMaterial({ color: 0xFFF6C2, emissive: 0xFFE58A, emissiveIntensity: 1.8 }));
+          worldGroup.add(mesh);
           moteMeshes.set(m.id, mesh);
         }
         mesh.visible = m.active;
         if (m.active) {
-          const hoverY = 0.5 + Math.sin(now * 0.004 + m.pos[0] * 2) * 0.25;
-          mesh.position.set(m.pos[0], hoverY, m.pos[2]);
+          mesh.position.set(m.pos[0], m.pos[1] + 0.4 + Math.sin(now * 0.005 + m.pos[0]) * 0.2, m.pos[2]);
         }
       });
 
-      // Shades (Breathing inky blobs)
+      // Shades
       engine.shades.forEach(s => {
         let mesh = shadeMeshes.get(s.id);
         if (!mesh) {
-          mesh = createShadeMesh();
-          scene.add(mesh);
+          mesh = new THREE.Mesh(new THREE.SphereGeometry(0.7, 16, 16), new THREE.MeshStandardMaterial({ color: 0x120A1A, roughness: 0.3 }));
+          worldGroup.add(mesh);
           shadeMeshes.set(s.id, mesh);
         }
-        mesh.position.set(s.pos[0], 0, s.pos[2]);
-        if (s.state === 'stunned') {
-          mesh.scale.set(0.65, 0.4, 0.65);
-          mesh.rotation.y += 0.1;
-        } else {
-          const breath = 1.0 + Math.sin(now * 0.008 + s.pos[0]) * 0.08;
-          mesh.scale.set(breath, breath, breath);
-          mesh.lookAt(engine.player.pos[0], 0, engine.player.pos[2]);
-        }
+        mesh.position.set(s.pos[0], s.pos[1] + 0.7, s.pos[2]);
       });
 
-      // Billowing Clouds rotation
-      clouds.forEach((c, idx) => {
-        c.rotation.z += 0.0003 * (idx + 1);
-      });
+      // Camera Follow
+      camera.position.x += (engine.player.pos[0] - camera.position.x) * 0.08;
+      camera.position.z += (engine.player.pos[2] + 12 - camera.position.z) * 0.08;
+      camera.position.y += (engine.player.pos[1] + 8 - camera.position.y) * 0.08;
+      camera.lookAt(engine.player.pos[0], engine.player.pos[1] + 1, engine.player.pos[2]);
 
-      // Camera Shake decay & Follow
-      if (cameraShake > 0.005) {
-        cameraShake *= 0.9;
-      } else {
-        cameraShake = 0;
+      // Ambient light progression
+      const litCount = engine.lanterns.filter(l => l.lit).length;
+      ambientLight.intensity = 0.15 + 0.55 * (litCount / Math.max(1, engine.lanterns.length));
+
+      // HUD Updates
+      const m = Math.floor(engine.timeLeftS / 60);
+      const s = Math.floor(engine.timeLeftS % 60);
+      const tDigits = document.getElementById('timer-display');
+      tDigits.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+      if (engine.timeLeftS <= 30) tDigits.classList.add('timer-danger');
+      else tDigits.classList.remove('timer-danger');
+
+      document.getElementById('lit-stat').innerText = `${litCount}/${engine.lanterns.length}`;
+      document.getElementById('score-stat').innerText = engine.score;
+      document.getElementById('mote-count').innerText = engine.player.carried;
+
+      // 10 Slots update
+      for (let i = 0; i < 10; i++) {
+        const slot = document.getElementById(`slot-${i}`);
+        if (i < engine.player.carried) slot.classList.add('slot-filled');
+        else slot.classList.remove('slot-filled');
       }
-      const shakeX = (Math.random() - 0.5) * cameraShake * 1.5;
-      const shakeY = (Math.random() - 0.5) * cameraShake * 1.5;
 
-      const targetCamX = engine.player.pos[0] + shakeX;
-      const targetCamZ = engine.player.pos[2] + 13 + shakeX;
-      camera.position.x += (targetCamX - camera.position.x) * 0.08;
-      camera.position.z += (targetCamZ - camera.position.z) * 0.08;
-      camera.position.y = 8.8 + shakeY;
-      camera.lookAt(engine.player.pos[0], 1.2, engine.player.pos[2]);
-
-      // Update HUD Numbers
-      document.getElementById('carried-txt').innerText = engine.player.carried;
-      document.getElementById('lit-txt').innerText = engine.lanterns.filter(l => l.lit).length;
-      document.getElementById('score-txt').innerText = engine.score;
-      document.getElementById('time-txt').innerText = Math.ceil(engine.timeLeftS) + 's';
-
-      // Flames display
+      // Flames
       for (let i = 1; i <= 3; i++) {
         const f = document.getElementById(`flame-${i}`);
-        if (i > engine.player.flames) {
-          f.classList.add('flame-lost');
-          f.innerText = '💀';
-        } else {
-          f.classList.remove('flame-lost');
-          f.innerText = '🔥';
-        }
+        if (i > engine.player.flames) f.classList.add('flame-lost');
+        else f.classList.remove('flame-lost');
       }
 
-      // Pulse Cooldown Overlay
-      const cdOverlay = document.getElementById('cd-overlay');
-      if (engine.player.pulse_cooldown_ticks > 0) {
-        cdOverlay.style.display = 'flex';
-        cdOverlay.innerText = (engine.player.pulse_cooldown_ticks / 60).toFixed(1) + 's';
+      // Cooldowns
+      const dashCd = document.getElementById('dash-cd');
+      if (engine.player.dash_cd_ticks > 0 && engine.player.charm_ticks <= 0) {
+        dashCd.style.display = 'flex';
+        dashCd.innerText = (engine.player.dash_cd_ticks / 60).toFixed(1) + 's';
       } else {
-        cdOverlay.style.display = 'none';
+        dashCd.style.display = 'none';
       }
 
-      // Render Minimap Radar
-      renderRadar();
+      const pulseCd = document.getElementById('pulse-cd');
+      if (engine.player.pulse_cd_ticks > 0) {
+        pulseCd.style.display = 'flex';
+        pulseCd.innerText = (engine.player.pulse_cd_ticks / 60).toFixed(1) + 's';
+      } else {
+        pulseCd.style.display = 'none';
+      }
 
+      // Prompt near unlit lantern
+      const prompt = document.getElementById('interact-prompt');
+      let nearLantern = engine.lanterns.find(l => !l.lit && Math.sqrt((engine.player.pos[0] - l.pos[0])**2 + (engine.player.pos[2] - l.pos[2])**2) <= 2.0);
+      if (nearLantern) {
+        prompt.style.display = 'block';
+        document.getElementById('prompt-fill').innerText = nearLantern.deposited;
+      } else {
+        prompt.style.display = 'none';
+      }
+
+      drawRadar();
       renderer.render(scene, camera);
     }
-
-    requestAnimationFrame(gameLoop);
+    requestAnimationFrame(animate);
   </script>
 </body>
 </html>

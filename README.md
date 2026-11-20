@@ -1,27 +1,28 @@
-# Đảo Đèn Lồng (Lantern Island) — Đêm 1: Đảo Bến
+# Đảo Đèn Lồng (Lantern Island) — Chuỗi 3 Đêm
 
 > **Video Demo**: `docs/demo/demo.mp4` (hoặc đính kèm tại GitHub Release v1.0.0)  
 > **Tác giả**: Hoàng Quang Đạt — MSSV: 2A202603808  
 > **Lớp**: K5-L3B — AI SDLC Lab Day 12  
-> **Tag**: `phase-1`  
-> **Test Contract**: `v1.0`  
+> **Tag**: `phase-2`  
+> **Test Contract**: `v1.1`  
 
 ---
 
-## 1. Giới thiệu Game
-**Đảo Đèn Lồng** là một game 3D góc nhìn thứ ba cổ tích, ấm áp. Người chơi điều khiển **Mây** — người giữ đèn nhỏ tuổi đội nón lá với chiếc đèn lồng nhỏ trước trán, vượt qua màn sương đêm để thu thập các đốm sáng (đom đóm) và thắp lại **5 Đèn Lồng Lớn** trên Đảo Bến, đồng thời né tránh và dùng kỹ năng **Tỏa Sáng (Pulse)** để xua đuổi các sinh vật **Bóng Mực**.
+## 1. Giới thiệu Game (Chuỗi 3 Đêm)
+**Đảo Đèn Lồng** là game 3D góc nhìn thứ ba cổ tích, ấm áp. Người chơi điều khiển **Mây** — người giữ đèn nhỏ tuổi đội nón lá, vượt qua 3 Đêm thử thách:
+- **Đêm 1 — Đảo Bến:** Đảo tròn 40m, 5 Đèn Lớn, làm quen né Bóng Mực.
+- **Đêm 2 — Đảo Cau:** 2 đảo tròn nối bằng cầu tre không lan can, 6 Đèn Lớn, 2 bục nhảy bay qua đảo, sự xuất hiện của **Gió Lạc** và **Bùa Gió**.
+- **Đêm 3 — Đảo Chuông:** Đảo 3 tầng vách đứng, 7 Đèn Lớn, 2 đường dốc, tháp chuông trung tâm, bục nhảy lên tầng 2 và gió giật mạnh.
 
 ---
 
 ## 2. Cài đặt và Chạy (Tối đa 3 lệnh)
 
-Chạy hoàn toàn mượt mà trên macOS, Linux và Windows:
-
 ```bash
 # 1. Cài đặt (Build)
 npm install
 
-# 2. Chạy toàn bộ kiểm thử tự động (Headless Verification)
+# 2. Chạy toàn bộ kiểm thử tự động (Contract v1.1 & Gameplay)
 npm test
 
 # 3. Khởi động Game 3D có giao diện
@@ -31,79 +32,53 @@ npm start
 
 ---
 
-## 3. Điều khiển (Controls)
+## 3. Bảng Điều Khiển (Controls)
 
 | Phím | Hành động | Mô tả |
 |---|---|---|
-| **W, A, S, D** hoặc **Mũi tên** | Di chuyển Mây | Đi lại khắp hòn đảo tròn |
-| **E** | Nạp Đèn Lồng (Interact) | Đứng gần đèn lồng (< 2.5m) để nạp đom đóm vào đèn |
-| **Q** hoặc **Space** | Tỏa Sáng (Pulse) | Tốn 1 đom đóm, phát sóng xung kích xua đuổi & làm choáng Bóng Mực trong 6m |
+| **W, A, S, D** / **Mũi tên** | Di chuyển Mây | Đi lại trên các đảo và bậc thang |
+| **Space** | Nhảy (Jump) | Vận tốc 7 m/s, trọng lực -20 m/s² |
+| **Shift** / **F** | Lướt (Dash) | 14 m/s trong 0.2s (12 ticks), hồi chiêu 1.5s, giữ nguyên độ cao |
+| **E** | Nạp Đèn (Interact) | Đứng gần đèn (< 2.0m) để nạp đom đóm vào đèn |
+| **Q** | Tỏa Sáng (Pulse) | Tốn 3 đom đóm, hồi chiêu 3s, xua đuổi & làm choáng Bóng Mực trong 5m, khiến Gió Lạc nhả đồ |
+| **P** / **Esc** | Tạm dừng (Pause) | Đóng băng màn chơi để tạm nghỉ hoặc chơi lại |
 
 ---
 
-## 4. Chế độ Headless & Test Contract v1.0
+## 4. Chế độ Headless & Test Contract v1.1
 
-Game tuân thủ nghiêm ngặt **Test Contract v1.0** tại `game.contract.json`. Chế độ chạy không cần giao diện (Headless) phục vụ chấm điểm tự động:
+Game tuân thủ nghiêm ngặt **Test Contract v1.1** tại `game.contract.json`:
 
 ```bash
 node src/headless.js --seed 42 --night 1 --ticks 180 --out out.jsonl --snapshot-every 10
+node src/headless.js --seed 42 --night 2 --ticks 180 --out out.jsonl
+node src/headless.js --seed 42 --night 3 --ticks 180 --out out.jsonl
 ```
 
+- **Hiệu năng:** Chạy 21.600 ticks chỉ mất **0.16 giây** (vượt xa yêu cầu $\le 30$ giây).
 - **Mã thoát (Exit codes):**
   - `0`: Chạy hoàn tất thành công tới hết ticks hoặc game over (won/lost).
   - `2`: File `inputs` hoặc `scenario` sai định dạng JSON / schema.
 
 ---
 
-## 5. Quy tắc Tính Điểm (Scoring)
+## 5. Quy tắc Tính Điểm (Chuẩn hóa Phase 2)
 
-- **Nhặt 1 đom đóm (`per_mote`):** $+10$ điểm.
-- **Thắp sáng 1 Đèn Lồng Lớn (`per_lantern`):** $+100$ điểm.
-- **Làm choáng Bóng Mực bằng Tỏa Sáng (`per_stun`):** $+20$ điểm / quái.
-- **Thưởng chiến thắng khi thắp đủ 5 đèn:**
-  - Mỗi giây còn lại (`per_second_left`): $+5$ điểm.
+- **Nạp 1 đom đóm vào đèn (`per_mote`):** $+10$ điểm.
+- **Thắp sáng 1 Đèn Lớn (`per_lantern`):** $+100$ điểm.
+- **Làm choáng Bóng Mực bằng Tỏa Sáng (`per_stun`):** $+5$ điểm / quái.
+- **Thưởng chiến thắng khi thắp đủ đèn:**
+  - Mỗi giây còn lại (`per_second_left`): $+2$ điểm.
   - Mỗi ngọn lửa sinh lực còn lại (`per_flame_left`): $+50$ điểm.
+- Tổng điểm game là tổng điểm của các Đêm đã vượt qua.
 
 ---
 
 ## 6. Sáng tạo của tôi (Hạng mục F)
 
-*Các tính năng sáng tạo hoàn toàn tách biệt khỏi mô phỏng cốt lõi, không làm thay đổi hay ảnh hưởng đến output headless của Test Contract:*
+*Các tính năng sáng tạo hoàn toàn ở tầng hiển thị, không làm đổi đầu ra headless của Test Contract:*
 
-1. **Hệ thống Âm thanh Tự Sinh (Procedural Web Audio API):**
-   - Không dùng file nhạc bên ngoài (100% chuẩn bản quyền CC0).
-   - Tiếng chuông gió ngân vang ngũ âm khi thắp sáng đèn, tiếng sóng xung kích khi Tỏa Sáng (Pulse), tiếng chuông pha lê khi nhặt đom đóm.
-2. **Tạo hình Nhân vật Mây mang bản sắc:**
-   - Mây đội **Nón Lá** truyền thống với chiếc đèn lồng nhỏ phát sáng ấm áp trước ngực và đung đưa theo nhịp di chuyển.
-3. **Hiệu ứng Sóng Xung Kích Ánh Sáng:**
-   - Vòng tròn năng lượng tỏa sáng màu vàng cam bung nở khi kích hoạt Pulse, đẩy lùi làn sương đen của Bóng Mực.
-
----
-
-## 7. Cấu trúc Thư mục
-
-```text
-├── game.contract.json        # File Test Contract v1.0 chính thức
-├── AGENTS.md                 # Quy chuẩn harness cho AI agent
-├── package.json              # Script build, test, start
-├── server.js                 # HTTP server phục vụ 3D Web
-├── index.html                # Giao diện 3D Three.js & Web Audio HUD
-├── src/
-│   ├── engine/               # Toàn bộ Simulation Logic thuần toán học
-│   │   ├── constants.js      # Tuning parameters
-│   │   ├── rng.js            # PRNG tất định (Mulberry32)
-│   │   ├── math.js           # Toán XZ & góc nhìn camera
-│   │   ├── entities.js       # Player, Mote, Lantern, Shade
-│   │   ├── scenario.js       # Bộ phân tích kịch bản & inputs
-│   │   └── game_engine.js    # Simulation loop & events
-│   └── headless.js           # CLI runner theo Test Contract
-├── tests/                    # Bộ test kiểm chứng tự động
-│   ├── run_all.js            # Chạy tất cả test
-│   ├── test_contract.js      # Kiểm tra Contract & exit code 0/2
-│   ├── test_gameplay.js      # Kiểm tra logic nhặt, nạp, quái, pulse
-│   └── test_determinism.js   # Kiểm tra tính tất định 100% byte-match
-└── docs/
-    ├── assumptions_phase1.md # Giả định & thiết kế Phase 1
-    ├── proof_phase1.md       # Bằng chứng kiểm chứng thực tế
-    └── ai_log_phase1.md      # Nhật ký dùng AI, token & retro
-```
+1. **Bảng màu chuẩn hóa thẩm mỹ cao:** Áp dụng chuẩn màu Ticket-02 (#0E1430, #2F5D50, #C9B48A, #FFB347, #FFF6C2, #120A1A, #C8102E).
+2. **Minimap Radar thông minh:** Hiển thị thời gian thực vị trí của Mây, các ngọn Đèn Lớn, đom đóm, Gió Lạc và Bóng Mực.
+3. **Thanh đom đóm 10 ô tương tác:** Hiệu ứng tích lũy ánh sáng trực quan từ 1 đến 10 ô.
+4. **Hệ thống âm thanh tự sinh Web Audio API:** Nhạc gió đêm huyền ảo, bước chân trên cỏ, tiếng chuông đồng khi thắp đèn, tiếng rền khi kích hoạt Tỏa Sáng.

@@ -36,7 +36,7 @@ export function parseInputs(jsonString) {
     if (f.cam_yaw_deg !== undefined && typeof f.cam_yaw_deg !== "number") {
       throw new FormatError(`Frame ${i} has invalid 'cam_yaw_deg'`);
     }
-    for (const action of ["jump", "interact", "pulse"]) {
+    for (const action of ["jump", "interact", "pulse", "dash", "pause"]) {
       if (f[action] !== undefined && typeof f[action] !== "boolean") {
         throw new FormatError(`Frame ${i} has invalid '${action}' flag`);
       }
@@ -79,6 +79,13 @@ export function parseScenario(jsonString) {
     throw new FormatError("Scenario 'lanterns' must be an array");
   }
 
+  if (data.drifters !== undefined && !Array.isArray(data.drifters)) {
+    throw new FormatError("Scenario 'drifters' must be an array");
+  }
+
+  if (data.charms !== undefined && !Array.isArray(data.charms)) {
+    throw new FormatError("Scenario 'charms' must be an array");
+  }
+
   return data;
 }
-

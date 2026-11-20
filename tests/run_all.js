@@ -1,14 +1,16 @@
 import { runContractTests } from './test_contract.js';
 import { runGameplayTests } from './test_gameplay.js';
+import { runPhase2Tests } from './test_phase2.js';
 import { runDeterminismTests } from './test_determinism.js';
 
 console.log("=========================================");
-console.log(" RUNNING ALL PHASE 1 AUTOMATED TESTS");
+console.log(" RUNNING ALL PHASE 2 AUTOMATED TESTS");
 console.log("=========================================\n");
 
 try {
   runContractTests();
   runGameplayTests();
+  runPhase2Tests();
   runDeterminismTests();
   console.log("=========================================");
   console.log(" ALL TESTS PASSED (100% SUCCESS)!");
@@ -18,4 +20,3 @@ try {
   console.error("\nTEST SUITE FAILED:", err);
   process.exit(1);
 }
-

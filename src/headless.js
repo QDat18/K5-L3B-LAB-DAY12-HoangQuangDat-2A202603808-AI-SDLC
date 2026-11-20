@@ -87,6 +87,7 @@ async function main() {
   // Initialize engine
   const engine = new GameEngine({
     seed: options.seed,
+    night: options.night,
     scenario: scenarioData
   });
 
