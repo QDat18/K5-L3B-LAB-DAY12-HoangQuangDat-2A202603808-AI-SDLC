@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Đảo Đèn Lồng - Chuỗi 3 Đêm (Phase 2 Masterpiece)</title>
+  <title>Đảo Đèn Lồng - Phát Hành v1.0.0 (Phase 4 Masterpiece)</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
 
@@ -15,7 +15,16 @@
       overflow: hidden;
       width: 100vw;
       height: 100vh;
+      font-size: 18px; /* Standard baseline for 1280x720 accessibility */
     }
+    body.large-font-mode {
+      font-size: 22.5px !important; /* 1.25x scaling */
+    }
+    body.large-font-mode .stat-label { font-size: 13px !important; }
+    body.large-font-mode .stat-val { font-size: 25px !important; }
+    body.large-font-mode .timer-digits { font-size: 38px !important; }
+    body.large-font-mode .hud-bottom .glass-card { font-size: 16px !important; }
+
     #game-canvas {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -62,7 +71,7 @@
       width: 100%;
     }
 
-    /* Left: Flames & Night Title */
+    /* Left: Flames & Night Title & Menu Shortcuts */
     .night-title {
       font-family: 'Cinzel', serif;
       font-size: 18px;
@@ -128,7 +137,7 @@
       align-items: flex-end;
     }
     .stat-label {
-      font-size: 10px;
+      font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 1.2px;
       color: #8FA3B8;
@@ -146,6 +155,39 @@
       background: rgba(14, 20, 48, 0.9);
       overflow: hidden;
       box-shadow: 0 0 16px rgba(0,0,0,0.8);
+      position: relative;
+    }
+
+    /* Directional Indicator Canvas */
+    #edge-indicator-cvs {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 12;
+    }
+
+    /* Subtitles / Alert Banners */
+    #subtitles-banner {
+      position: absolute;
+      top: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(18, 10, 26, 0.88);
+      border: 1px solid #F2C14E;
+      border-radius: 20px;
+      padding: 6px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #FFE9B0;
+      display: none;
+      box-shadow: 0 0 20px rgba(242, 193, 78, 0.5);
+      z-index: 20;
+      pointer-events: none;
+      animation: subtitlePulse 1s infinite alternate;
+    }
+    @keyframes subtitlePulse {
+      from { transform: translateX(-50%) scale(0.98); }
+      to { transform: translateX(-50%) scale(1.02); }
     }
 
     /* Bottom: 10-Slot Mote Bar (Center) & Skills (Right) */
@@ -231,7 +273,7 @@
       border: 2px solid #FFB347;
       border-radius: 20px;
       padding: 8px 24px;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 700;
       color: #FFE9B0;
       display: none;
@@ -240,23 +282,30 @@
       z-index: 15;
     }
 
-    /* Toast Notification */
-    #toast-banner {
-      position: absolute;
-      top: 30%; left: 50%;
-      transform: translate(-50%, -50%);
-      font-family: 'Cinzel', serif;
-      font-size: 24px;
-      font-weight: 900;
+    /* Top Utility Bar (Leaderboard, Accessibility) */
+    .top-menu-bar {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+      pointer-events: auto;
+    }
+    .menu-mini-btn {
+      background: rgba(242, 193, 78, 0.2);
+      border: 1px solid #F2C14E;
+      border-radius: 6px;
       color: #FFE9B0;
-      text-shadow: 0 0 20px rgba(255, 179, 71, 0.9), 0 3px 6px #000;
-      opacity: 0;
-      transition: all 0.35s ease;
-      pointer-events: none;
-      z-index: 25;
+      font-size: 12px;
+      padding: 4px 10px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .menu-mini-btn:hover {
+      background: rgba(242, 193, 78, 0.4);
+      transform: scale(1.05);
     }
 
-    /* Modals: Menu, Pause, Victory/Defeat */
+    /* Modals: Menu, Pause, Leaderboard, Accessibility, Victory/Defeat */
     .overlay-modal {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -271,9 +320,12 @@
       background: #1B2350;
       border: 2px solid #F2C14E;
       border-radius: 20px;
-      padding: 36px 44px;
+      padding: 30px 40px;
       text-align: center;
-      max-width: 520px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
       box-shadow: 0 0 60px rgba(242, 193, 78, 0.3);
     }
     .modal-btn {
@@ -282,10 +334,10 @@
       border-radius: 10px;
       color: #FFF;
       font-family: 'Cinzel', serif;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
-      padding: 12px 30px;
-      margin: 8px;
+      padding: 10px 24px;
+      margin: 6px;
       cursor: pointer;
       transition: all 0.2s;
     }
@@ -293,15 +345,84 @@
       transform: scale(1.05);
       box-shadow: 0 0 20px #FFB347;
     }
+    .modal-btn-secondary {
+      background: rgba(255, 255, 255, 0.15) !important;
+      border: 1px solid #8FA3B8 !important;
+    }
+
+    /* Leaderboard Table */
+    .lb-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    .lb-table th {
+      color: #F2C14E;
+      border-bottom: 2px solid rgba(242, 193, 78, 0.4);
+      padding: 8px;
+    }
+    .lb-table td {
+      padding: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: #F5F1E6;
+    }
+    .lb-rank-1 { color: #FFD700 !important; font-weight: bold; }
+    .lb-rank-2 { color: #C0C0C0 !important; font-weight: bold; }
+    .lb-rank-3 { color: #CD7F32 !important; font-weight: bold; }
+
+    /* Accessibility Settings Form */
+    .setting-group {
+      text-align: left;
+      margin: 16px 0;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(242, 193, 78, 0.2);
+    }
+    .setting-group h4 {
+      color: #F2C14E;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+    .keybind-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 6px 0;
+      font-size: 14px;
+    }
+    .key-btn {
+      background: #0E1430;
+      border: 1px solid #F2C14E;
+      border-radius: 6px;
+      color: #FFF;
+      padding: 4px 12px;
+      cursor: pointer;
+      min-width: 80px;
+    }
+    .key-btn.recording {
+      background: #C8102E;
+      animation: keyBlink 0.5s infinite alternate;
+    }
+    @keyframes keyBlink {
+      from { opacity: 0.7; }
+      to { opacity: 1; }
+    }
+    .key-warning {
+      color: #FF5A5F;
+      font-size: 13px;
+      display: none;
+      margin-top: 4px;
+    }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
   <div id="vignette"></div>
   <canvas id="game-canvas"></canvas>
+  <canvas id="edge-indicator-cvs"></canvas>
 
-  <div id="interact-prompt">E — Nạp ánh sáng (<span id="prompt-fill">0</span>/10)</div>
-  <div id="toast-banner"></div>
+  <div id="interact-prompt"><span id="prompt-key-label">E</span> — Nạp ánh sáng (<span id="prompt-fill">0</span>/10)</div>
+  <div id="subtitles-banner">⚠️ Chỉ báo hình ảnh</div>
 
   <!-- HUD Overlay -->
   <div id="hud">
@@ -312,6 +433,10 @@
           <div class="flame-pip" id="flame-1">🔥</div>
           <div class="flame-pip" id="flame-2">🔥</div>
           <div class="flame-pip" id="flame-3">🔥</div>
+        </div>
+        <div class="top-menu-bar">
+          <button class="menu-mini-btn" onclick="openLeaderboard()">🏆 Xếp Hạng</button>
+          <button class="menu-mini-btn" onclick="openAccessibility()">⚙️ Trợ Năng</button>
         </div>
       </div>
 
@@ -332,10 +457,10 @@
     </div>
 
     <div class="hud-bottom">
-      <div class="glass-card" style="font-size:12px; line-height:1.6; color:#C9B48A;">
-        <div><strong style="color:#FFF;">W A S D</strong> : Di chuyển · <strong style="color:#FFF;">Space</strong> : Nhảy</div>
-        <div><strong style="color:#FFF;">Shift / F</strong> : Lướt (14 m/s) · <strong style="color:#FFF;">Q</strong> : Tỏa Sáng</div>
-        <div><strong style="color:#FFF;">P / Esc</strong> : Tạm dừng</div>
+      <div class="glass-card" id="hud-instructions" style="font-size:13px; line-height:1.6; color:#C9B48A;">
+        <div><strong style="color:#FFF;" id="lbl-move">W A S D</strong> : Di chuyển · <strong style="color:#FFF;" id="lbl-jump">Space</strong> : Nhảy</div>
+        <div><strong style="color:#FFF;" id="lbl-dash">Shift</strong> : Lướt (14 m/s) · <strong style="color:#FFF;" id="lbl-pulse">Q</strong> : Tỏa Sáng</div>
+        <div><strong style="color:#FFF;" id="lbl-pause">P / Esc</strong> : Tạm dừng</div>
       </div>
 
       <!-- 10-Slot Mote Capacity Bar -->
@@ -347,17 +472,17 @@
       </div>
 
       <div class="skills-row">
-        <!-- Dash [Shift] -->
+        <!-- Dash -->
         <div class="skill-btn" id="dash-btn" onclick="triggerDash()">
           💨
-          <span class="skill-key-badge">Shift</span>
+          <span class="skill-key-badge" id="badge-dash">Shift</span>
           <div class="cd-cover" id="dash-cd">1.5s</div>
         </div>
 
-        <!-- Pulse [Q] -->
+        <!-- Pulse -->
         <div class="skill-btn" id="pulse-btn" onclick="triggerPulse()">
           ✨
-          <span class="skill-key-badge">Q</span>
+          <span class="skill-key-badge" id="badge-pulse">Q</span>
           <div class="cd-cover" id="pulse-cd">3.0s</div>
         </div>
       </div>
@@ -370,8 +495,10 @@
       <h2 style="font-family:'Cinzel', serif; color:#F2C14E; margin-bottom:16px;">TẠM DỪNG</h2>
       <p style="color:#8FA3B8; margin-bottom:24px;">Hành trình giữ đèn đang được giữ yên.</p>
       <div><button class="modal-btn" onclick="togglePause()">Tiếp Tục</button></div>
+      <div><button class="modal-btn" onclick="openAccessibility()">Cài Đặt Trợ Năng</button></div>
+      <div><button class="modal-btn" onclick="openLeaderboard()">Bảng Xếp Hạng</button></div>
       <div><button class="modal-btn" onclick="restartCurrentNight()">Chơi Lại Đêm Này</button></div>
-      <div><button class="modal-btn" onclick="switchNight(1)">Về Đêm 1</button></div>
+      <div><button class="modal-btn modal-btn-secondary" onclick="switchNight(1)">Về Đêm 1</button></div>
     </div>
   </div>
 
@@ -379,9 +506,86 @@
   <div id="end-modal" class="overlay-modal">
     <div class="modal-dialog">
       <h1 id="end-title" style="font-family:'Cinzel', serif; color:#F2C14E; font-size:32px; margin-bottom:12px;">CHIẾN THẮNG</h1>
-      <p id="end-desc" style="color:#C9B48A; line-height:1.6; margin-bottom:24px;">Tất cả ngọn đèn đã thắp sáng rực rỡ!</p>
+      <p id="end-desc" style="color:#C9B48A; line-height:1.6; margin-bottom:18px;">Tất cả ngọn đèn đã thắp sáng rực rỡ!</p>
+      
+      <!-- Save to Leaderboard Form -->
+      <div style="background:rgba(14,20,48,0.7); border:1px solid rgba(242,193,78,0.4); border-radius:12px; padding:16px; margin: 14px 0;">
+        <label style="display:block; font-size:14px; color:#FFE9B0; margin-bottom:6px;">Nhập tên lưu vào Bảng Xếp Hạng (3-12 ký tự):</label>
+        <input id="player-name-input" type="text" maxlength="12" placeholder="NguoiGiuDen" style="padding:8px 14px; border-radius:8px; border:1px solid #F2C14E; background:#0E1430; color:#FFF; font-size:16px; width: 65%; text-align:center;">
+        <button class="modal-btn" style="padding:8px 16px; font-size:14px;" onclick="savePlayerScore()">Lưu Điểm</button>
+        <div id="save-msg" style="font-size:13px; color:#8FA3B8; margin-top:4px;"></div>
+      </div>
+
       <button class="modal-btn" id="next-night-btn" onclick="nextNight()">Đêm Tiếp Theo</button>
-      <button class="modal-btn" onclick="restartCurrentNight()">Chơi Lại</button>
+      <button class="modal-btn" onclick="openLeaderboard()">Xem Xếp Hạng</button>
+      <button class="modal-btn modal-btn-secondary" onclick="restartCurrentNight()">Chơi Lại</button>
+    </div>
+  </div>
+
+  <!-- Leaderboard Modal -->
+  <div id="leaderboard-modal" class="overlay-modal">
+    <div class="modal-dialog">
+      <h2 style="font-family:'Cinzel', serif; color:#F2C14E; margin-bottom:12px;">🏆 BẢNG XẾP HẠNG (TOP 10)</h2>
+      <p style="color:#8FA3B8; font-size:13px;">Ghi danh những Người Giữ Đèn kiên cường nhất của Quần Đảo</p>
+      <table class="lb-table">
+        <thead>
+          <tr>
+            <th>Hạng</th>
+            <th>Tên</th>
+            <th>Điểm</th>
+            <th>Đêm Thắng</th>
+            <th>Thời Gian</th>
+          </tr>
+        </thead>
+        <tbody id="lb-table-body">
+          <tr><td colspan="5">Đang tải...</td></tr>
+        </tbody>
+      </table>
+      <button class="modal-btn" onclick="closeLeaderboard()">Đóng</button>
+    </div>
+  </div>
+
+  <!-- Accessibility Settings Modal -->
+  <div id="accessibility-modal" class="overlay-modal">
+    <div class="modal-dialog">
+      <h2 style="font-family:'Cinzel', serif; color:#F2C14E; margin-bottom:16px;">⚙️ TÙY CHỌN TRỢ NĂNG</h2>
+
+      <!-- General Options -->
+      <div class="setting-group">
+        <h4>1. Thị Giác & Hiển Thị</h4>
+        <label style="display:flex; align-items:center; gap:8px; margin:8px 0; cursor:pointer;">
+          <input type="checkbox" id="chk-large-font" onchange="toggleLargeFont(this.checked)">
+          <span>Cỡ chữ UI lớn (×1.25) — Tối thiểu 18px ở 1280×720</span>
+        </label>
+        <label style="display:flex; align-items:center; gap:8px; margin:8px 0; cursor:pointer;">
+          <input type="checkbox" id="chk-reduced-motion" onchange="toggleReducedMotion(this.checked)">
+          <span>Giảm chuyển động (Tắt rung camera & chớp đỏ khi trúng đòn)</span>
+        </label>
+        <label style="display:flex; align-items:center; gap:8px; margin:8px 0; cursor:pointer;">
+          <input type="checkbox" id="chk-visual-cues" checked onchange="toggleVisualCues(this.checked)">
+          <span>Phụ đề & chỉ báo hình ảnh (Bóng Mực, gió thổi, 10s cuối, đèn sắp cạn dầu)</span>
+        </label>
+      </div>
+
+      <!-- Key Remapping -->
+      <div class="setting-group">
+        <h4>2. Đổi Phím Điều Khiển</h4>
+        <div class="keybind-row"><span>Tiến (Forward):</span> <button class="key-btn" id="bind-up" onclick="recordKey('up')">W</button></div>
+        <div class="keybind-row"><span>Lùi (Backward):</span> <button class="key-btn" id="bind-down" onclick="recordKey('down')">S</button></div>
+        <div class="keybind-row"><span>Trái (Left):</span> <button class="key-btn" id="bind-left" onclick="recordKey('left')">A</button></div>
+        <div class="keybind-row"><span>Phải (Right):</span> <button class="key-btn" id="bind-right" onclick="recordKey('right')">D</button></div>
+        <div class="keybind-row"><span>Nhảy (Jump):</span> <button class="key-btn" id="bind-jump" onclick="recordKey('jump')">Space</button></div>
+        <div class="keybind-row"><span>Lướt (Dash):</span> <button class="key-btn" id="bind-dash" onclick="recordKey('dash')">Shift</button></div>
+        <div class="keybind-row"><span>Tỏa Sáng (Pulse):</span> <button class="key-btn" id="bind-pulse" onclick="recordKey('pulse')">Q</button></div>
+        <div class="keybind-row"><span>Tương Tác (Interact):</span> <button class="key-btn" id="bind-interact" onclick="recordKey('interact')">E</button></div>
+        <div class="keybind-row"><span>Tạm Dừng (Pause):</span> <button class="key-btn" id="bind-pause" onclick="recordKey('pause')">P</button></div>
+        <div id="key-conflict-warning" class="key-warning">⚠️ Phát hiện phím bị trùng! Vui lòng chọn phím phân biệt.</div>
+        <div style="margin-top:10px; text-align:right;">
+          <button class="modal-btn modal-btn-secondary" style="font-size:13px; padding:6px 14px;" onclick="resetDefaultKeybinds()">Khôi Phục Mặc Định</button>
+        </div>
+      </div>
+
+      <button class="modal-btn" onclick="closeAccessibility()">Lưu & Đóng</button>
     </div>
   </div>
 
@@ -420,27 +624,264 @@
       } catch (e) {}
     }
 
+    // Keybindings & Accessibility Storage
+    const DEFAULT_BINDS = {
+      up: 'w',
+      down: 's',
+      left: 'a',
+      right: 'd',
+      jump: ' ',
+      dash: 'Shift',
+      pulse: 'q',
+      interact: 'e',
+      pause: 'p'
+    };
+
+    let userBinds = { ...DEFAULT_BINDS };
+    try {
+      const savedBinds = localStorage.getItem('dao_den_long_keybinds');
+      if (savedBinds) userBinds = { ...DEFAULT_BINDS, ...JSON.parse(savedBinds) };
+    } catch (e) {}
+
+    let isReducedMotion = localStorage.getItem('dao_den_long_reduced_motion') === 'true';
+    let isLargeFont = localStorage.getItem('dao_den_long_large_font') === 'true';
+    let isVisualCues = localStorage.getItem('dao_den_long_visual_cues') !== 'false';
+
+    if (isLargeFont) {
+      document.body.classList.add('large-font-mode');
+      const chk = document.getElementById('chk-large-font');
+      if (chk) chk.checked = true;
+    }
+    if (isReducedMotion) {
+      const chk = document.getElementById('chk-reduced-motion');
+      if (chk) chk.checked = true;
+    }
+    if (!isVisualCues) {
+      const chk = document.getElementById('chk-visual-cues');
+      if (chk) chk.checked = false;
+    }
+
+    function updateKeybindLabels() {
+      for (const [action, key] of Object.entries(userBinds)) {
+        const btn = document.getElementById(`bind-${action}`);
+        if (btn) btn.innerText = key === ' ' ? 'Space' : key.toUpperCase();
+      }
+      const pLabel = document.getElementById('prompt-key-label');
+      if (pLabel) pLabel.innerText = userBinds.interact === ' ' ? 'Space' : userBinds.interact.toUpperCase();
+      const bDash = document.getElementById('badge-dash');
+      if (bDash) bDash.innerText = userBinds.dash === ' ' ? 'Space' : userBinds.dash.toUpperCase();
+      const bPulse = document.getElementById('badge-pulse');
+      if (bPulse) bPulse.innerText = userBinds.pulse === ' ' ? 'Space' : userBinds.pulse.toUpperCase();
+
+      const lblMove = document.getElementById('lbl-move');
+      if (lblMove) lblMove.innerText = `${userBinds.up.toUpperCase()} ${userBinds.left.toUpperCase()} ${userBinds.down.toUpperCase()} ${userBinds.right.toUpperCase()}`;
+      const lblJump = document.getElementById('lbl-jump');
+      if (lblJump) lblJump.innerText = userBinds.jump === ' ' ? 'Space' : userBinds.jump.toUpperCase();
+      const lblDash = document.getElementById('lbl-dash');
+      if (lblDash) lblDash.innerText = userBinds.dash === ' ' ? 'Space' : userBinds.dash.toUpperCase();
+      const lblPulse = document.getElementById('lbl-pulse');
+      if (lblPulse) lblPulse.innerText = userBinds.pulse === ' ' ? 'Space' : userBinds.pulse.toUpperCase();
+    }
+    updateKeybindLabels();
+
+    // Key recording for remapping
+    let recordingAction = null;
+    window.recordKey = (action) => {
+      recordingAction = action;
+      document.querySelectorAll('.key-btn').forEach(b => b.classList.remove('recording'));
+      const btn = document.getElementById(`bind-${action}`);
+      if (btn) {
+        btn.classList.add('recording');
+        btn.innerText = 'Bấm phím...';
+      }
+    };
+
+    window.resetDefaultKeybinds = () => {
+      userBinds = { ...DEFAULT_BINDS };
+      localStorage.setItem('dao_den_long_keybinds', JSON.stringify(userBinds));
+      document.getElementById('key-conflict-warning').style.display = 'none';
+      updateKeybindLabels();
+    };
+
+    window.toggleLargeFont = (val) => {
+      isLargeFont = val;
+      localStorage.setItem('dao_den_long_large_font', val);
+      if (val) document.body.classList.add('large-font-mode');
+      else document.body.classList.remove('large-font-mode');
+    };
+
+    window.toggleReducedMotion = (val) => {
+      isReducedMotion = val;
+      localStorage.setItem('dao_den_long_reduced_motion', val);
+    };
+
+    window.toggleVisualCues = (val) => {
+      isVisualCues = val;
+      localStorage.setItem('dao_den_long_visual_cues', val);
+      if (!val) {
+        document.getElementById('subtitles-banner').style.display = 'none';
+      }
+    };
+
+    window.openAccessibility = () => {
+      document.getElementById('accessibility-modal').style.display = 'flex';
+    };
+    window.closeAccessibility = () => {
+      document.getElementById('accessibility-modal').style.display = 'none';
+    };
+
+    // Subtitle helper
+    let subtitleTimeout = null;
+    function showSubtitle(text, durationMs = 3000) {
+      if (!isVisualCues) return;
+      const b = document.getElementById('subtitles-banner');
+      b.innerText = text;
+      b.style.display = 'block';
+      if (subtitleTimeout) clearTimeout(subtitleTimeout);
+      subtitleTimeout = setTimeout(() => {
+        b.style.display = 'none';
+      }, durationMs);
+    }
+
+    // Leaderboard Functions
+    window.openLeaderboard = async () => {
+      document.getElementById('leaderboard-modal').style.display = 'flex';
+      const tbody = document.getElementById('lb-table-body');
+      tbody.innerHTML = '<tr><td colspan="5">Đang tải dữ liệu...</td></tr>';
+
+      let entries = [];
+      try {
+        const res = await fetch('/api/leaderboard');
+        if (res.ok) {
+          const data = await res.json();
+          entries = data.entries || [];
+        }
+      } catch (e) {
+        const local = localStorage.getItem('dao_den_long_leaderboard');
+        if (local) entries = JSON.parse(local).entries || [];
+      }
+
+      if (entries.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5">Chưa có ai lưu điểm. Hãy là người đầu tiên!</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '';
+      entries.forEach((e, idx) => {
+        const tr = document.createElement('tr');
+        const rankClass = idx === 0 ? 'lb-rank-1' : idx === 1 ? 'lb-rank-2' : idx === 2 ? 'lb-rank-3' : '';
+        const d = new Date(e.achieved_at);
+        const dateStr = !isNaN(d.getTime()) ? `${d.getHours()}:${d.getMinutes().toString().padStart(2,'0')} ${d.getDate()}/${d.getMonth()+1}` : 'Vừa xong';
+        tr.innerHTML = `
+          <td class="${rankClass}">#${idx + 1}</td>
+          <td class="${rankClass}">${e.name}</td>
+          <td><strong style="color:#F2C14E;">${e.score}</strong></td>
+          <td>Đêm ${e.nights_won}</td>
+          <td style="color:#8FA3B8; font-size:12px;">${dateStr}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    };
+
+    window.closeLeaderboard = () => {
+      document.getElementById('leaderboard-modal').style.display = 'none';
+    };
+
+    window.savePlayerScore = async () => {
+      const nameInput = document.getElementById('player-name-input');
+      const msg = document.getElementById('save-msg');
+      const rawName = (nameInput.value || '').trim();
+      if (rawName.length < 3 || rawName.length > 12) {
+        msg.style.color = '#FF5A5F';
+        msg.innerText = 'Tên phải từ 3 đến 12 ký tự!';
+        return;
+      }
+
+      const payload = {
+        name: rawName,
+        score: engine.score,
+        nights_won: currentNight - 1,
+        seed: engine.seed
+      };
+
+      try {
+        const res = await fetch('/api/leaderboard', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          msg.style.color = '#70E000';
+          msg.innerText = 'Đã lưu điểm thành công!';
+          setTimeout(() => {
+            document.getElementById('end-modal').style.display = 'none';
+            openLeaderboard();
+          }, 800);
+          return;
+        }
+      } catch (err) {}
+
+      // Fallback local storage
+      let local = [];
+      try {
+        const prev = localStorage.getItem('dao_den_long_leaderboard');
+        if (prev) local = JSON.parse(prev).entries || [];
+      } catch (e) {}
+      payload.achieved_at = new Date().toISOString();
+      local.push(payload);
+      local.sort((a,b) => b.score - a.score);
+      localStorage.setItem('dao_den_long_leaderboard', JSON.stringify({ entries: local.slice(0, 10) }));
+
+      msg.style.color = '#70E000';
+      msg.innerText = 'Đã lưu cục bộ thành công!';
+      setTimeout(() => {
+        document.getElementById('end-modal').style.display = 'none';
+        openLeaderboard();
+      }, 800);
+    };
+
     // State & Engine
     let currentNight = 1;
     let engine = new GameEngine({ seed: Math.floor(Math.random() * 100000), night: currentNight });
 
-    const keyState = {
-      w: false, a: false, s: false, d: false,
-      ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false,
-      e: false, q: false, ' ': false, Shift: false, f: false, p: false, Escape: false
-    };
+    const keyState = {};
 
     window.addEventListener('keydown', (e) => {
       ensureAudio();
-      if (keyState.hasOwnProperty(e.key)) keyState[e.key] = true;
-      if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') togglePause();
-    });
-    window.addEventListener('keyup', (e) => {
-      if (keyState.hasOwnProperty(e.key)) keyState[e.key] = false;
+
+      if (recordingAction) {
+        e.preventDefault();
+        const pressedKey = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+        userBinds[recordingAction] = pressedKey;
+        recordingAction = null;
+        document.querySelectorAll('.key-btn').forEach(b => b.classList.remove('recording'));
+
+        // Check for duplicates
+        const values = Object.values(userBinds);
+        const hasDup = new Set(values).size !== values.length;
+        const warn = document.getElementById('key-conflict-warning');
+        if (warn) warn.style.display = hasDup ? 'block' : 'none';
+
+        localStorage.setItem('dao_den_long_keybinds', JSON.stringify(userBinds));
+        updateKeybindLabels();
+        return;
+      }
+
+      keyState[e.key] = true;
+      keyState[e.key.toLowerCase()] = true;
+
+      if (e.key === userBinds.pause || e.key.toLowerCase() === userBinds.pause.toLowerCase() || e.key === 'Escape') {
+        togglePause();
+      }
     });
 
-    window.triggerDash = () => { keyState.Shift = true; setTimeout(() => keyState.Shift = false, 50); };
-    window.triggerPulse = () => { keyState.q = true; setTimeout(() => keyState.q = false, 50); };
+    window.addEventListener('keyup', (e) => {
+      keyState[e.key] = false;
+      keyState[e.key.toLowerCase()] = false;
+    });
+
+    window.triggerDash = () => { keyState[userBinds.dash] = true; setTimeout(() => keyState[userBinds.dash] = false, 50); };
+    window.triggerPulse = () => { keyState[userBinds.pulse] = true; setTimeout(() => keyState[userBinds.pulse] = false, 50); };
     window.togglePause = () => {
       ensureAudio();
       const pModal = document.getElementById('pause-modal');
@@ -448,76 +889,105 @@
       setTimeout(() => engine.step({ pause: false }), 20);
       pModal.style.display = engine.isPaused ? 'flex' : 'none';
     };
+
     window.restartCurrentNight = () => {
-      engine = new GameEngine({ seed: Math.floor(Math.random() * 100000), night: currentNight });
       document.getElementById('pause-modal').style.display = 'none';
       document.getElementById('end-modal').style.display = 'none';
-      rebuild3DWorld();
-    };
-    window.switchNight = (n) => {
-      currentNight = n;
-      window.restartCurrentNight();
-    };
-    window.nextNight = () => {
-      if (currentNight < 3) window.switchNight(currentNight + 1);
-      else window.switchNight(1);
+      engine = new GameEngine({ seed: Math.floor(Math.random() * 100000), night: currentNight });
+      resetSceneForNight();
     };
 
-    // Three.js 3D Setup
+    window.nextNight = () => {
+      document.getElementById('end-modal').style.display = 'none';
+      if (currentNight < 3) {
+        currentNight++;
+        engine = new GameEngine({ seed: Math.floor(Math.random() * 100000), night: currentNight });
+        resetSceneForNight();
+      } else {
+        openLeaderboard();
+      }
+    };
+
+    window.switchNight = (n) => {
+      document.getElementById('pause-modal').style.display = 'none';
+      document.getElementById('end-modal').style.display = 'none';
+      currentNight = n;
+      engine = new GameEngine({ seed: Math.floor(Math.random() * 100000), night: currentNight });
+      resetSceneForNight();
+    };
+
+    // 3D Scene Setup
     const canvas = document.getElementById('game-canvas');
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0E1430);
-    scene.fog = new THREE.FogExp2(0x1B2350, 0.012);
-
-    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 800);
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+      const edgeCvs = document.getElementById('edge-indicator-cvs');
+      if (edgeCvs) {
+        edgeCvs.width = window.innerWidth;
+        edgeCvs.height = window.innerHeight;
+      }
     });
 
-    const ambientLight = new THREE.AmbientLight(0x2F5D50, 0.5);
+    const edgeCvs = document.getElementById('edge-indicator-cvs');
+    edgeCvs.width = window.innerWidth;
+    edgeCvs.height = window.innerHeight;
+    const edgeCtx = edgeCvs.getContext('2d');
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0E1430);
+    scene.fog = new THREE.FogExp2(0x0E1430, 0.015);
+
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 15, 25);
+
+    const ambientLight = new THREE.AmbientLight(0x2A355A, 0.25);
     scene.add(ambientLight);
-    const moonLight = new THREE.DirectionalLight(0xC9B48A, 0.8);
-    moonLight.position.set(60, 120, 60);
+
+    const moonLight = new THREE.DirectionalLight(0x9EB3D6, 0.4);
+    moonLight.position.set(30, 60, 40);
     scene.add(moonLight);
 
-    // Dynamic 3D Objects Container
     const worldGroup = new THREE.Group();
     scene.add(worldGroup);
 
-    // Player Mesh
-    const playerGroup = new THREE.Group();
-    const robe = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.55, 1.3, 16), new THREE.MeshStandardMaterial({ color: 0xE8E2D0 }));
-    robe.position.y = 0.65;
-    playerGroup.add(robe);
-
-    const hat = new THREE.Mesh(new THREE.ConeGeometry(0.85, 0.42, 24), new THREE.MeshStandardMaterial({ color: 0xC9B48A }));
-    hat.position.y = 1.65;
-    playerGroup.add(hat);
-
-    const scarf = new THREE.Mesh(new THREE.TorusGeometry(0.38, 0.08, 8, 16), new THREE.MeshStandardMaterial({ color: 0xC8102E }));
-    scarf.rotation.x = Math.PI / 2;
-    scarf.position.y = 1.35;
-    playerGroup.add(scarf);
-
-    const playerPntLight = new THREE.PointLight(0xFFB347, 1.2, 9);
-    playerPntLight.position.set(0, 1.5, 0);
-    playerGroup.add(playerPntLight);
-    scene.add(playerGroup);
-
+    let islandMesh = null;
     let lanternMeshes = [];
     let moteMeshes = new Map();
     let shadeMeshes = new Map();
     let drifterMeshes = new Map();
     let charmMeshes = new Map();
 
-    function rebuild3DWorld() {
-      // Clear world
+    // Player Mesh
+    const playerGroup = new THREE.Group();
+    const bodyMat = new THREE.MeshStandardMaterial({ color: 0xF2C14E, roughness: 0.4 });
+    const pBody = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.45, 1.1, 16), bodyMat);
+    pBody.position.y = 0.55;
+    playerGroup.add(pBody);
+
+    const hatMat = new THREE.MeshStandardMaterial({ color: 0xD4A373, roughness: 0.6 });
+    const pHat = new THREE.Mesh(new THREE.ConeGeometry(0.85, 0.4, 16), hatMat);
+    pHat.position.y = 1.25;
+    playerGroup.add(pHat);
+
+    const pLantern = new THREE.Mesh(
+      new THREE.SphereGeometry(0.16, 12, 12),
+      new THREE.MeshStandardMaterial({ color: 0xFFF6C2, emissive: 0xFFB347, emissiveIntensity: 2.0 })
+    );
+    pLantern.position.set(0.4, 0.7, 0.3);
+    playerGroup.add(pLantern);
+
+    const pLight = new THREE.PointLight(0xFFB347, 1.8, 8);
+    pLight.position.set(0.4, 0.7, 0.3);
+    playerGroup.add(pLight);
+
+    scene.add(playerGroup);
+
+    function resetSceneForNight() {
       while (worldGroup.children.length > 0) {
         worldGroup.remove(worldGroup.children[0]);
       }
@@ -527,72 +997,84 @@
       drifterMeshes.clear();
       charmMeshes.clear();
 
-      document.getElementById('night-banner').innerText = `ĐÊM ${currentNight} — ${currentNight === 1 ? 'ĐẢO BẾN' : (currentNight === 2 ? 'ĐẢO CAU' : 'ĐẢO CHUÔNG')}`;
+      const map = getMapForNight(currentNight);
+      const titleBanner = document.getElementById('night-banner');
+      if (currentNight === 1) titleBanner.innerText = 'ĐÊM 1 — ĐẢO BẾN';
+      else if (currentNight === 2) titleBanner.innerText = 'ĐÊM 2 — QUẦN ĐẢO NỐI';
+      else titleBanner.innerText = 'ĐÊM 3 — GIÓ CUỐN';
 
-      // Island Terrains
-      if (currentNight === 1) {
-        const isl = new THREE.Mesh(new THREE.CylinderGeometry(40, 36, 8, 64), new THREE.MeshStandardMaterial({ color: 0x2F5D50 }));
-        isl.position.y = -4;
-        worldGroup.add(isl);
-      } else if (currentNight === 2) {
-        // Two islands
-        const islA = new THREE.Mesh(new THREE.CylinderGeometry(28, 24, 8, 48), new THREE.MeshStandardMaterial({ color: 0x2F5D50 }));
-        islA.position.set(0, -4, 0);
-        const islB = new THREE.Mesh(new THREE.CylinderGeometry(28, 24, 8, 48), new THREE.MeshStandardMaterial({ color: 0x2F5D50 }));
-        islB.position.set(70, -4, 0);
-        // Bridge
-        const br = new THREE.Mesh(new THREE.BoxGeometry(18, 0.4, 4), new THREE.MeshStandardMaterial({ color: 0x6B4A2F }));
-        br.position.set(35, -0.2, 0);
-        worldGroup.add(islA, islB, br);
-      } else if (currentNight === 3) {
-        // 3 Tiers
-        const t0 = new THREE.Mesh(new THREE.CylinderGeometry(45, 42, 4, 64), new THREE.MeshStandardMaterial({ color: 0x2F5D50 }));
-        t0.position.y = -2;
-        const t1 = new THREE.Mesh(new THREE.CylinderGeometry(24, 24, 3, 32, 1, false, 0, Math.PI), new THREE.MeshStandardMaterial({ color: 0x3a6a5d }));
-        t1.position.set(0, 1.5, 0);
-        const t2 = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 3, 32), new THREE.MeshStandardMaterial({ color: 0xC9B48A }));
-        t2.position.set(0, 4.5, 0);
-        // Bell tower
-        const bTower = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 8, 16), new THREE.MeshStandardMaterial({ color: 0x6B4A2F }));
-        bTower.position.set(0, 10, 0);
-        worldGroup.add(t0, t1, t2, bTower);
+      // Build Island(s)
+      if (map.islands) {
+        map.islands.forEach(isl => {
+          const cyl = new THREE.Mesh(
+            new THREE.CylinderGeometry(isl.radius, isl.radius + 2, 8, 36),
+            new THREE.MeshStandardMaterial({ color: 0x1B2350, roughness: 0.85 })
+          );
+          cyl.position.set(isl.center[0], -4, isl.center[2]);
+          worldGroup.add(cyl);
+
+          // Island Rim
+          const rim = new THREE.Mesh(
+            new THREE.RingGeometry(isl.radius - 0.4, isl.radius, 36),
+            new THREE.MeshBasicMaterial({ color: 0xF2C14E, opacity: 0.35, transparent: true, side: THREE.DoubleSide })
+          );
+          rim.rotation.x = -Math.PI / 2;
+          rim.position.set(isl.center[0], 0.05, isl.center[2]);
+          worldGroup.add(rim);
+        });
       }
 
-      // Rebuild Lanterns
+      // Build Lanterns
       engine.lanterns.forEach(l => {
-        const g = new THREE.Group();
-        g.position.set(l.pos[0], l.pos[1], l.pos[2]);
-        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.25, 3.6, 8), new THREE.MeshStandardMaterial({ color: 0x6B4A2F }));
-        post.position.y = 1.8;
-        const bMat = new THREE.MeshStandardMaterial({ color: 0x5B5F6E, emissive: 0x000000 });
-        const box = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.1, 0.9), bMat);
-        box.position.y = 3.2;
-        const light = new THREE.PointLight(0xFFB347, 0, 16);
-        light.position.y = 3.2;
-        g.add(post, box, light);
-        worldGroup.add(g);
-        lanternMeshes.push({ id: l.id, boxMat: bMat, light });
+        const group = new THREE.Group();
+        group.position.set(l.pos[0], l.pos[1], l.pos[2]);
+
+        const pillar = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.2, 0.25, 2.0, 12),
+          new THREE.MeshStandardMaterial({ color: 0x3A3450 })
+        );
+        pillar.position.y = 1.0;
+        group.add(pillar);
+
+        const boxMat = new THREE.MeshStandardMaterial({ color: 0xFFB347, emissive: 0x000000, emissiveIntensity: 0 });
+        const box = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.9, 0.8), boxMat);
+        box.position.y = 2.2;
+        group.add(box);
+
+        const light = new THREE.PointLight(0xFFB347, 0, 18);
+        light.position.y = 2.2;
+        group.add(light);
+
+        worldGroup.add(group);
+        lanternMeshes.push({ group, boxMat, light });
       });
+
+      playerGroup.position.set(engine.player.pos[0], engine.player.pos[1], engine.player.pos[2]);
+      showSubtitle(`Bắt đầu Đêm ${currentNight}! Hãy thắp sáng các ngọn đèn.`);
     }
 
-    rebuild3DWorld();
+    resetSceneForNight();
 
-    // Radar Minimap
-    const radarCvs = document.getElementById('radar-cvs');
-    const rCtx = radarCvs.getContext('2d');
+    // Radar Canvas
+    const rCvs = document.getElementById('radar-cvs');
+    const rCtx = rCvs.getContext('2d');
+
     function drawRadar() {
       rCtx.clearRect(0, 0, 90, 90);
-      rCtx.fillStyle = 'rgba(14, 20, 48, 0.7)';
-      rCtx.fillRect(0, 0, 90, 90);
-      const cx = 45, cy = 45, scale = 40 / (currentNight === 2 ? 80 : 45);
+      const cx = 45, cy = 45, scale = 1.5;
 
+      rCtx.fillStyle = 'rgba(14, 20, 48, 0.85)';
+      rCtx.fillRect(0, 0, 90, 90);
+
+      // Lanterns
       engine.lanterns.forEach(l => {
         rCtx.beginPath();
-        rCtx.arc(cx + l.pos[0] * scale, cy + l.pos[2] * scale, 3, 0, Math.PI * 2);
-        rCtx.fillStyle = l.lit ? '#FFB347' : '#5B5F6E';
+        rCtx.arc(cx + l.pos[0] * scale, cy + l.pos[2] * scale, 3.5, 0, Math.PI * 2);
+        rCtx.fillStyle = l.lit ? '#FFB347' : '#8FA3B8';
         rCtx.fill();
       });
 
+      // Motes
       engine.motes.forEach(m => {
         if (m.active) {
           rCtx.beginPath();
@@ -602,6 +1084,7 @@
         }
       });
 
+      // Shades
       engine.shades.forEach(s => {
         rCtx.beginPath();
         rCtx.arc(cx + s.pos[0] * scale, cy + s.pos[2] * scale, 2.5, 0, Math.PI * 2);
@@ -616,40 +1099,102 @@
       rCtx.fill();
     }
 
+    // Edge Directional Arrows for Shades (Accessibility Indicator)
+    function drawEdgeIndicators() {
+      edgeCtx.clearRect(0, 0, edgeCvs.width, edgeCvs.height);
+      if (!isVisualCues) return;
+
+      const px = engine.player.pos[0];
+      const pz = engine.player.pos[2];
+
+      // Find shades within warning distance (e.g. 15m)
+      const w = edgeCvs.width;
+      const h = edgeCvs.height;
+      const cx = w / 2;
+      const cy = h / 2;
+
+      engine.shades.forEach(s => {
+        if (s.state === 'stunned') return;
+        const dx = s.pos[0] - px;
+        const dz = s.pos[2] - pz;
+        const dist = Math.sqrt(dx * dx + dz * dz);
+
+        if (dist > 3.0 && dist < 18.0) {
+          // Calculate angle relative to camera view
+          const angle = Math.atan2(dx, dz);
+          const edgeDist = Math.min(cx, cy) - 45;
+          const ax = cx + Math.sin(angle) * edgeDist;
+          const ay = cy - Math.cos(angle) * edgeDist;
+
+          // Draw directional triangle
+          edgeCtx.save();
+          edgeCtx.translate(ax, ay);
+          edgeCtx.rotate(-angle);
+          edgeCtx.fillStyle = 'rgba(200, 16, 46, 0.8)';
+          edgeCtx.strokeStyle = '#FFE9B0';
+          edgeCtx.lineWidth = 1.5;
+
+          edgeCtx.beginPath();
+          edgeCtx.moveTo(0, -14);
+          edgeCtx.lineTo(9, 10);
+          edgeCtx.lineTo(-9, 10);
+          edgeCtx.closePath();
+          edgeCtx.fill();
+          edgeCtx.stroke();
+          edgeCtx.restore();
+        }
+      });
+    }
+
     // Animation Loop
     let lastTime = performance.now();
+    let tenSecWarningShown = false;
+    let windWarningShown = false;
+    let prevShadeCount = 0;
+
     function animate(now) {
       requestAnimationFrame(animate);
       const dt = now - lastTime;
       lastTime = now;
 
-      // Check inputs
+      // Check inputs based on user keybindings
       let mx = 0, mz = 0;
-      if (keyState.w || keyState.ArrowUp) mz += 1;
-      if (keyState.s || keyState.ArrowDown) mz -= 1;
-      if (keyState.a || keyState.ArrowLeft) mx -= 1;
-      if (keyState.d || keyState.ArrowRight) mx += 1;
+      if (keyState[userBinds.up] || keyState[userBinds.up.toLowerCase()] || keyState.ArrowUp) mz += 1;
+      if (keyState[userBinds.down] || keyState[userBinds.down.toLowerCase()] || keyState.ArrowDown) mz -= 1;
+      if (keyState[userBinds.left] || keyState[userBinds.left.toLowerCase()] || keyState.ArrowLeft) mx -= 1;
+      if (keyState[userBinds.right] || keyState[userBinds.right.toLowerCase()] || keyState.ArrowRight) mx += 1;
+
+      const isJumping = Boolean(keyState[userBinds.jump] || keyState[userBinds.jump.toLowerCase()]);
+      const isInteracting = Boolean(keyState[userBinds.interact] || keyState[userBinds.interact.toLowerCase()]);
+      const isPulsing = Boolean(keyState[userBinds.pulse] || keyState[userBinds.pulse.toLowerCase()]);
+      const isDashing = Boolean(keyState[userBinds.dash] || keyState[userBinds.dash.toLowerCase()] || keyState.Shift);
 
       const events = engine.step({
         move: [mx, mz],
         cam_yaw_deg: 0,
-        jump: keyState[' '],
-        interact: keyState.e,
-        pulse: keyState.q,
-        dash: keyState.Shift || keyState.f
+        jump: isJumping,
+        interact: isInteracting,
+        pulse: isPulsing,
+        dash: isDashing
       });
 
       // Handle Event SFX & UI
       for (const ev of events) {
         if (ev.name === 'mote_picked') playTone(784, 'triangle', 0.15, 0.2);
         else if (ev.name === 'deposit') playTone(440, 'sine', 0.25, 0.2);
-        else if (ev.name === 'lantern_lit') playTone(880, 'sine', 0.6, 0.3);
+        else if (ev.name === 'lantern_lit') {
+          playTone(880, 'sine', 0.6, 0.3);
+          showSubtitle(`🏮 Đèn ${ev.data.id} đã bừng sáng!`);
+        }
         else if (ev.name === 'dash') playTone(220, 'sawtooth', 0.2, 0.25);
         else if (ev.name === 'pulse') playTone(330, 'sawtooth', 0.4, 0.3);
         else if (ev.name === 'player_hit') {
           playTone(90, 'square', 0.3, 0.4);
-          document.getElementById('vignette').classList.add('hit-flash');
-          setTimeout(() => document.getElementById('vignette').classList.remove('hit-flash'), 300);
+          if (!isReducedMotion) {
+            document.getElementById('vignette').classList.add('hit-flash');
+            setTimeout(() => document.getElementById('vignette').classList.remove('hit-flash'), 300);
+          }
+          showSubtitle('⚠️ Bạn bị Bóng Mực tấn công!');
         }
         else if (ev.name === 'game_over') {
           const eModal = document.getElementById('end-modal');
@@ -659,11 +1204,32 @@
           if (ev.data.result === 'won') {
             eTitle.innerText = `CHIẾN THẮNG ĐÊM ${currentNight}!`;
             eDesc.innerText = `Tất cả ngọn đèn đã rực sáng! Điểm số: ${engine.score}`;
+            document.getElementById('next-night-btn').innerText = currentNight === 3 ? 'Bình Minh (Kết Thúc)' : 'Đêm Tiếp Theo';
           } else {
             eTitle.innerText = 'THẤT BẠI!';
             eDesc.innerText = ev.data.reason === 'no_flames' ? 'Ngọn lửa sinh lực đã tàn!' : 'Bình minh đã ló dạng!';
           }
         }
+      }
+
+      // Check Subtitle Alerts (Accessibility)
+      if (engine.shades.length > prevShadeCount && engine.shades.length > 0) {
+        showSubtitle('⚠️ Bóng Mực xuất hiện trong sương đen!');
+      }
+      prevShadeCount = engine.shades.length;
+
+      // 10s warning
+      if (engine.timeLeftS <= 10 && !tenSecWarningShown && engine.timeLeftS > 0) {
+        tenSecWarningShown = true;
+        showSubtitle('⏳ Còn 10 giây cuối! Nhanh chân lên!');
+      } else if (engine.timeLeftS > 10) {
+        tenSecWarningShown = false;
+      }
+
+      // Lantern fuel < 30 warning
+      const lowFuelLantern = engine.lanterns.find(l => l.lit && l.fuel !== undefined && l.fuel < 30);
+      if (lowFuelLantern) {
+        showSubtitle(`🏮 Đèn ${lowFuelLantern.id} sắp cạn dầu (<30%)!`);
       }
 
       // Update 3D Positions
@@ -688,7 +1254,10 @@
       engine.motes.forEach(m => {
         let mesh = moteMeshes.get(m.id);
         if (!mesh) {
-          mesh = new THREE.Mesh(new THREE.SphereGeometry(0.18, 12, 12), new THREE.MeshStandardMaterial({ color: 0xFFF6C2, emissive: 0xFFE58A, emissiveIntensity: 1.8 }));
+          mesh = new THREE.Mesh(
+            new THREE.SphereGeometry(0.18, 12, 12),
+            new THREE.MeshStandardMaterial({ color: 0xFFF6C2, emissive: 0xFFE58A, emissiveIntensity: 1.8 })
+          );
           worldGroup.add(mesh);
           moteMeshes.set(m.id, mesh);
         }
@@ -702,7 +1271,10 @@
       engine.shades.forEach(s => {
         let mesh = shadeMeshes.get(s.id);
         if (!mesh) {
-          mesh = new THREE.Mesh(new THREE.SphereGeometry(0.7, 16, 16), new THREE.MeshStandardMaterial({ color: 0x120A1A, roughness: 0.3 }));
+          mesh = new THREE.Mesh(
+            new THREE.SphereGeometry(0.7, 16, 16),
+            new THREE.MeshStandardMaterial({ color: 0x120A1A, roughness: 0.3 })
+          );
           worldGroup.add(mesh);
           shadeMeshes.set(s.id, mesh);
         }
@@ -773,6 +1345,7 @@
       }
 
       drawRadar();
+      drawEdgeIndicators();
       renderer.render(scene, camera);
     }
     requestAnimationFrame(animate);
