@@ -69,3 +69,4 @@ export function runContractTests() {
 
   console.log("Contract tests passed successfully!\n");
 }
+

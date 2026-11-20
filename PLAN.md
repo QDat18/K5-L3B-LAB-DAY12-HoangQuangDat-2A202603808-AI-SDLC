@@ -35,3 +35,4 @@ Dự án: Đảo Đèn Lồng (Lantern Island)
     - `per_stun`: $20$
     - `per_second_left`: $5$
     - `per_flame_left`: $50$
+

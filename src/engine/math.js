@@ -40,3 +40,4 @@ export function transformMove(move, cam_yaw_deg = 0) {
   }
   return [nx, nz];
 }
+

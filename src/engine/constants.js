@@ -39,3 +39,4 @@ export const DEFAULT_LANTERNS = [
   { id: "L4", pos: [-14.695, 0.0, -20.225] },
   { id: "L5", pos: [-23.776, 0.0, 7.725] }
 ];
+

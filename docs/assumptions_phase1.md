@@ -20,3 +20,4 @@
 - pulse_cost = 1 đom đóm, pulse_radius = 6.0 m, pulse_push_m = 3.0 m, stun = 3.0 s.
 - safe_radius = 4.0 m quanh đèn đã thắp (Bóng Mực bị chặn không vào được).
 - flames = 3 mạng, invuln_s = 2.0 s sau khi trúng đòn, rơi 50% đom đóm.
+

@@ -18,3 +18,4 @@ Kết quả: 100% Passed.
 
 ### C. Tính Tất Định (Determinism)
 - [x] Hai lần chạy độc lập với cùng seed = 8888, 180 ticks tạo ra 2 tệp JSONL trùng khớp hoàn toàn từng byte.
+

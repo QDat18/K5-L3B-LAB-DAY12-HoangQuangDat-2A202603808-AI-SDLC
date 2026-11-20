@@ -16,3 +16,4 @@
 ## 3. Danh gia Phase 1 (Retro)
 - Hoan thanh dung han: 100% yeu cau PRD-0 va Test Contract v1.0.
 - Bo test tu dong bao phu toan bo logic truoc khi ghep giao dien 3D.
+

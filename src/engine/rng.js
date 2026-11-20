@@ -22,3 +22,4 @@ export class PRNG {
     return min + this.next() * (max - min);
   }
 }
+

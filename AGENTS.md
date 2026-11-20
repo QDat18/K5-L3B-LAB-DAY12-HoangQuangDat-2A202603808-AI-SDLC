@@ -21,3 +21,4 @@ Dự án: Đảo Đèn Lồng (AI SDLC Day 12)
    - Khác `0`: Lỗi logic nghiêm trọng.
 4. **Không làm giả bằng chứng**:
    - Mọi test phải chạy thật và kiểm tra output JSONL thực tế.
+
