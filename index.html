@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đảo Đèn Lồng - Đêm 1: Đảo Bến</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      background: #0a0b14;
+      color: #f3efe6;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+    #game-canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: block;
+    }
+    /* HUD Overlay */
+    #hud {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px;
+    }
+    .hud-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .panel {
+      background: rgba(15, 18, 30, 0.75);
+      border: 1px solid rgba(255, 200, 100, 0.25);
+      border-radius: 12px;
+      padding: 12px 20px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+    .flames-container {
+      display: flex;
+      gap: 8px;
+      font-size: 24px;
+      align-items: center;
+    }
+    .hud-stats {
+      display: flex;
+      gap: 20px;
+    }
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #a8a090;
+    }
+    .stat-val {
+      font-size: 20px;
+      font-weight: bold;
+      color: #ffd166;
+    }
+    .hud-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .controls-hint {
+      font-size: 13px;
+      color: #c0b8aa;
+      line-height: 1.6;
+    }
+    .key-badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-weight: bold;
+      color: #fff;
+    }
+    .skill-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .skill-btn {
+      width: 54px; height: 54px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffb703 0%, #fb8500 100%);
+      border: 2px solid #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      box-shadow: 0 0 16px rgba(251, 133, 0, 0.6);
+    }
+    /* Modal Game Over */
+    #modal {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(5, 7, 15, 0.85);
+      backdrop-filter: blur(12px);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      pointer-events: auto;
+      z-index: 100;
+    }
+    .modal-box {
+      background: #141829;
+      border: 2px solid #ffd166;
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      max-width: 480px;
+      box-shadow: 0 0 50px rgba(255, 209, 102, 0.3);
+    }
+    .modal-title {
+      font-size: 32px;
+      margin-bottom: 12px;
+      color: #ffd166;
+    }
+    .modal-desc {
+      font-size: 16px;
+      color: #ddd;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .restart-btn {
+      background: linear-gradient(135deg, #ffb703, #fb8500);
+      border: none;
+      border-radius: 8px;
+      color: #111;
+      padding: 12px 32px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .restart-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(251, 133, 0, 0.8);
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+  <canvas id="game-canvas"></canvas>
+
+  <div id="hud">
+    <div class="hud-top">
+      <div class="panel">
+        <div class="stat-label">Sinh Lực (Flames)</div>
+        <div class="flames-container" id="flames-display">🔥🔥🔥</div>
+      </div>
+
+      <div class="panel hud-stats">
+        <div class="stat-item">
+          <div class="stat-label">Đom đóm mang theo</div>
+          <div class="stat-val"><span id="carried-count">0</span> / 5 💡</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Đèn Lớn Thắp Sáng</div>
+          <div class="stat-val"><span id="lit-count">0</span> / 5 🏮</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Điểm số</div>
+          <div class="stat-val" id="score-val">0</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Thời gian còn lại</div>
+          <div class="stat-val" id="timer-val">180s</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hud-bottom">
+      <div class="panel controls-hint">
+        <div><span class="key-badge">W A S D</span> hoặc <span class="key-badge">Mũi tên</span> : Di chuyển Mây</div>
+        <div><span class="key-badge">E</span> : Nạp đom đóm vào Đèn Lớn (đứng gần)</div>
+        <div><span class="key-badge">Q</span> hoặc <span class="key-badge">Phím Cách</span> : Tỏa Sáng (Pulse) xua Bóng Mực</div>
+      </div>
+
+      <div class="panel skill-card">
+        <div>
+          <div class="stat-label">Kỹ năng đặc biệt</div>
+          <div style="font-weight:bold; color:#ffb703;">Tỏa Sáng (Pulse [Q])</div>
+          <div style="font-size:11px; color:#aaa;">Tốn 1 đom đóm, đẩy lùi & làm choáng quái</div>
+        </div>
+        <div class="skill-btn" id="pulse-btn">✨</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal">
+    <div class="modal-box">
+      <h2 class="modal-title" id="modal-title">CHIẾN THẮNG!</h2>
+      <p class="modal-desc" id="modal-desc">5 Đèn Lồng Lớn đã thắp sáng hòn đảo, xua tan màn sương đen!</p>
+      <button class="restart-btn" id="restart-btn" onclick="restartGame()">Chơi Lại</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { GameEngine } from './src/engine/game_engine.js';
+
+    // --- PROCEDURAL AUDIO SYNTHESIZER (WEB AUDIO API - 100% CC0) ---
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) audioCtx = new AudioContext();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.2, gainVol = 0.15) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(gainVol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function soundMotePicked() { playTone(587.33, 'triangle', 0.25, 0.2); playTone(880.0, 'sine', 0.25, 0.15); }
+    function soundDeposit() { playTone(440, 'sine', 0.3, 0.25); }
+    function soundLanternLit() {
+      [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+        setTimeout(() => playTone(f, 'sine', 0.6, 0.3), i * 120);
+      });
+    }
+    function soundPulse() { playTone(300, 'sawtooth', 0.4, 0.2); playTone(600, 'sine', 0.5, 0.3); }
+    function soundHit() { playTone(120, 'square', 0.3, 0.35); }
+
+    // --- INITIALIZE GAME ENGINE ---
+    let engine = new GameEngine({ seed: Math.floor(Math.random() * 10000) });
+
+    // Key input handlers
+    const keys = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, e: false, q: false, ' ': false };
+    window.addEventListener('keydown', (e) => {
+      initAudio();
+      if (keys.hasOwnProperty(e.key)) keys[e.key] = true;
+    });
+    window.addEventListener('keyup', (e) => {
+      if (keys.hasOwnProperty(e.key)) keys[e.key] = false;
+    });
+
+    window.restartGame = () => {
+      engine = new GameEngine({ seed: Math.floor(Math.random() * 10000) });
+      document.getElementById('modal').style.display = 'none';
+    };
+
+    // --- THREE.JS 3D SCENE SETUP ---
+    const canvas = document.getElementById('game-canvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a0c16);
+    scene.fog = new THREE.FogExp2(0x0a0c16, 0.015);
+
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 500);
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0x2d3250, 0.8);
+    scene.add(ambientLight);
+
+    const moonLight = new THREE.DirectionalLight(0x708090, 0.6);
+    moonLight.position.set(50, 80, 50);
+    scene.add(moonLight);
+
+    // Island Ground (Cylinder with warm grassy top)
+    const islandGeo = new THREE.CylinderGeometry(40, 36, 12, 64);
+    const islandMat = new THREE.MeshStandardMaterial({ color: 0x1c2826, roughness: 0.9 });
+    const island = new THREE.Mesh(islandGeo, islandMat);
+    island.position.y = -6;
+    scene.add(island);
+
+    // Sea of clouds below
+    const cloudGeo = new THREE.PlaneGeometry(300, 300, 32, 32);
+    const cloudMat = new THREE.MeshBasicMaterial({ color: 0x070913, transparent: true, opacity: 0.8 });
+    const cloudPlane = new THREE.Mesh(cloudGeo, cloudMat);
+    cloudPlane.rotation.x = -Math.PI / 2;
+    cloudPlane.position.y = -12;
+    scene.add(cloudPlane);
+
+    // Lantern 3D Models
+    const lanternMeshes = [];
+    const lanternLights = [];
+    engine.lanterns.forEach(l => {
+      const group = new THREE.Group();
+      group.position.set(l.pos[0], 0, l.pos[2]);
+
+      // Wood post
+      const postGeo = new THREE.CylinderGeometry(0.2, 0.25, 4, 12);
+      const postMat = new THREE.MeshStandardMaterial({ color: 0x3d2b1f });
+      const post = new THREE.Mesh(postGeo, postMat);
+      post.position.y = 2;
+      group.add(post);
+
+      // Lantern box
+      const boxGeo = new THREE.BoxGeometry(0.9, 1.2, 0.9);
+      const boxMat = new THREE.MeshStandardMaterial({ color: 0x443322, emissive: 0x000000 });
+      const box = new THREE.Mesh(boxGeo, boxMat);
+      box.position.y = 3.4;
+      group.add(box);
+
+      // Light source (turns on when lit)
+      const pLight = new THREE.PointLight(0xffaa33, 0, 15);
+      pLight.position.set(0, 3.4, 0);
+      group.add(pLight);
+
+      scene.add(group);
+      lanternMeshes.push({ id: l.id, group, box, boxMat });
+      lanternLights.push(pLight);
+    });
+
+    // Player 3D Model (Mây with Nón Lá and small lantern)
+    const playerGroup = new THREE.Group();
+    // Body
+    const bodyGeo = new THREE.CylinderGeometry(0.4, 0.5, 1.4, 16);
+    const bodyMat = new THREE.MeshStandardMaterial({ color: 0xe0e1dd });
+    const body = new THREE.Mesh(bodyGeo, bodyMat);
+    body.position.y = 0.7;
+    playerGroup.add(body);
+
+    // Head
+    const headGeo = new THREE.SphereGeometry(0.35, 16, 16);
+    const headMat = new THREE.MeshStandardMaterial({ color: 0xffd1b3 });
+    const head = new THREE.Mesh(headGeo, headMat);
+    head.position.y = 1.6;
+    playerGroup.add(head);
+
+    // Nón Lá (Conical Palm Hat)
+    const hatGeo = new THREE.ConeGeometry(0.85, 0.45, 24);
+    const hatMat = new THREE.MeshStandardMaterial({ color: 0xd4a373, roughness: 0.8 });
+    const hat = new THREE.Mesh(hatGeo, hatMat);
+    hat.position.y = 1.9;
+    playerGroup.add(hat);
+
+    // Small Lantern on hat tip
+    const smallLanternGeo = new THREE.SphereGeometry(0.12, 12, 12);
+    const smallLanternMat = new THREE.MeshStandardMaterial({ color: 0xffb703, emissive: 0xffb703, emissiveIntensity: 1.2 });
+    const smallLantern = new THREE.Mesh(smallLanternGeo, smallLanternMat);
+    smallLantern.position.set(0.3, 1.8, 0.2);
+    playerGroup.add(smallLantern);
+
+    const playerLight = new THREE.PointLight(0xffb703, 1.2, 8);
+    playerLight.position.set(0, 1.8, 0);
+    playerGroup.add(playerLight);
+
+    scene.add(playerGroup);
+
+    // Pulse Shockwave Ring Mesh
+    const ringGeo = new THREE.RingGeometry(0.2, 0.6, 32);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0xffe066, side: THREE.DoubleSide, transparent: true, opacity: 0 });
+    const pulseRing = new THREE.Mesh(ringGeo, ringMat);
+    pulseRing.rotation.x = -Math.PI / 2;
+    pulseRing.position.y = 0.1;
+    scene.add(pulseRing);
+    let pulseAnim = { active: false, radius: 0, opacity: 0 };
+
+    // Dynamic Motes & Shades visual pools
+    const moteMeshMap = new Map();
+    const shadeMeshMap = new Map();
+
+    const moteGeo = new THREE.SphereGeometry(0.18, 12, 12);
+    const moteMat = new THREE.MeshStandardMaterial({ color: 0xffd166, emissive: 0xffd166, emissiveIntensity: 1.5 });
+
+    const shadeGeo = new THREE.SphereGeometry(0.7, 16, 16);
+    const shadeMat = new THREE.MeshStandardMaterial({ color: 0x110519, roughness: 0.4 });
+
+    // --- GAME LOOP (60 TICKS/SEC) ---
+    let lastTime = performance.now();
+    const tickInterval = 1000 / 60;
+    let accumulator = 0;
+
+    function gameLoop(now) {
+      requestAnimationFrame(gameLoop);
+      const dt = now - lastTime;
+      lastTime = now;
+      accumulator += dt;
+
+      while (accumulator >= tickInterval) {
+        accumulator -= tickInterval;
+
+        // Collect keyboard input
+        let mx = 0, mz = 0;
+        if (keys.w || keys.ArrowUp) mz += 1;
+        if (keys.s || keys.ArrowDown) mz -= 1;
+        if (keys.a || keys.ArrowLeft) mx -= 1;
+        if (keys.d || keys.ArrowRight) mx += 1;
+
+        const interact = keys.e;
+        const pulse = keys.q || keys[' '];
+
+        // Step engine simulation
+        const events = engine.step({
+          move: [mx, mz],
+          cam_yaw_deg: 0,
+          interact: interact,
+          pulse: pulse
+        });
+
+        // Trigger procedural audio events
+        for (const ev of events) {
+          if (ev.name === 'mote_picked') soundMotePicked();
+          else if (ev.name === 'deposit') soundDeposit();
+          else if (ev.name === 'lantern_lit') soundLanternLit();
+          else if (ev.name === 'pulse') {
+            soundPulse();
+            pulseAnim = { active: true, radius: 0.5, opacity: 0.9 };
+          }
+          else if (ev.name === 'player_hit') soundHit();
+          else if (ev.name === 'game_over') {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modal-title');
+            const desc = document.getElementById('modal-desc');
+            modal.style.display = 'flex';
+            if (ev.data.result === 'won') {
+              title.innerText = '🏮 CHIẾN THẮNG!';
+              desc.innerText = `Chúc mừng Mây! Bạn đã thắp sáng cả 5 Đèn Lớn với số điểm: ${engine.score}`;
+            } else {
+              title.innerText = '💀 THẤT BẠI!';
+              desc.innerText = ev.data.reason === 'dawn' ? 'Bình minh đã đến trước khi kịp thắp sáng đảo!' : 'Mây đã bị Bóng Mực hút cạn ngọn lửa!';
+            }
+          }
+        }
+      }
+
+      // Update 3D Visual Positions
+      playerGroup.position.set(engine.player.pos[0], engine.player.pos[1], engine.player.pos[2]);
+
+      // Lantern visual states
+      engine.lanterns.forEach((l, idx) => {
+        const item = lanternMeshes[idx];
+        if (l.lit) {
+          item.boxMat.emissive.setHex(0xffaa33);
+          item.boxMat.emissiveIntensity = 2.0;
+          lanternLights[idx].intensity = 2.5;
+        } else {
+          item.boxMat.emissive.setHex(0x000000);
+          lanternLights[idx].intensity = 0;
+        }
+      });
+
+      // Motes visuals
+      engine.motes.forEach(m => {
+        let mesh = moteMeshMap.get(m.id);
+        if (!mesh) {
+          mesh = new THREE.Mesh(moteGeo, moteMat);
+          scene.add(mesh);
+          moteMeshMap.set(m.id, mesh);
+        }
+        mesh.visible = m.active;
+        if (m.active) {
+          mesh.position.set(m.pos[0], 0.4 + Math.sin(now * 0.005 + m.pos[0]) * 0.2, m.pos[2]);
+        }
+      });
+
+      // Shades visuals
+      engine.shades.forEach(s => {
+        let mesh = shadeMeshMap.get(s.id);
+        if (!mesh) {
+          mesh = new THREE.Mesh(shadeGeo, shadeMat);
+          scene.add(mesh);
+          shadeMeshMap.set(s.id, mesh);
+        }
+        mesh.position.set(s.pos[0], 0.7, s.pos[2]);
+        if (s.state === 'stunned') {
+          mesh.scale.set(0.8, 0.8, 0.8);
+        } else {
+          mesh.scale.set(1.0, 1.0, 1.0);
+        }
+      });
+
+      // Pulse Animation Update
+      if (pulseAnim.active) {
+        pulseAnim.radius += 0.25;
+        pulseAnim.opacity -= 0.025;
+        pulseRing.position.set(engine.player.pos[0], 0.1, engine.player.pos[2]);
+        pulseRing.scale.set(pulseAnim.radius, pulseAnim.radius, 1);
+        ringMat.opacity = Math.max(0, pulseAnim.opacity);
+        if (pulseAnim.opacity <= 0) pulseAnim.active = false;
+      }
+
+      // Smooth Camera Follow
+      const targetCamX = engine.player.pos[0];
+      const targetCamZ = engine.player.pos[2] + 12;
+      camera.position.x += (targetCamX - camera.position.x) * 0.08;
+      camera.position.z += (targetCamZ - camera.position.z) * 0.08;
+      camera.position.y = 9;
+      camera.lookAt(engine.player.pos[0], 1, engine.player.pos[2]);
+
+      // Update HUD
+      const flamesDisplay = '🔥'.repeat(Math.max(0, engine.player.flames)) || '💀';
+      document.getElementById('flames-display').innerText = flamesDisplay;
+      document.getElementById('carried-count').innerText = engine.player.carried;
+      document.getElementById('lit-count').innerText = engine.lanterns.filter(l => l.lit).length;
+      document.getElementById('score-val').innerText = engine.score;
+      document.getElementById('timer-val').innerText = Math.ceil(engine.timeLeftS) + 's';
+
+      renderer.render(scene, camera);
+    }
+
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>

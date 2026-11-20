@@ -1,0 +1,20 @@
+{
+  "name": "k5-l3b-day12-dao-den-long",
+  "version": "1.0.0",
+  "description": "Game 3D Đảo Đèn Lồng - AI SDLC Day 12",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tests/run_all.js",
+    "headless": "node src/headless.js"
+  },
+  "keywords": [
+    "game",
+    "3d",
+    "threejs",
+    "ai-sdlc"
+  ],
+  "author": "Hoang Quang Dat - 2A202603808",
+  "license": "MIT"
+}

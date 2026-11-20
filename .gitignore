@@ -1,0 +1,5 @@
+node_modules/
+tests/tmp/
+out.jsonl
+*.log
+.DS_Store
